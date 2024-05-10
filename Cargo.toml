@@ -1,0 +1,10 @@
+[package]
+name = "website"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-files = "0.6.5"
+actix-web = { version = "4.5.1", features = ["openssl"] }
+openssl = "0.10.64"
+
