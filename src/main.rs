@@ -1,12 +1,14 @@
+mod security;
+
 use actix_files as fs;
 use actix_web::{
-    dev::{fn_service, Service, ServiceRequest, ServiceResponse},
-    http::{
-        header::{HeaderValue, STRICT_TRANSPORT_SECURITY},
-        StatusCode,
-    },
+    dev::{fn_service, ServiceRequest, ServiceResponse},
+    http::StatusCode,
     App, HttpServer,
 };
+use actix_web_lab::middleware::from_fn;
+use security::force_hsts;
+
 use fs::NamedFile;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
@@ -34,18 +36,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             // force HSTS on all outgoing http responses, tagged client-side for the next two years (=63072000s)
-            .wrap_fn(|req, srv| {
-                let fut: _ = srv.call(req);
-                async {
-                    let mut res = fut.await?;
-                    let hdrs = res.headers_mut();
-                    hdrs.insert(
-                        STRICT_TRANSPORT_SECURITY,
-                        HeaderValue::from_static("max-age=63072000; includeSubDomains; preload"),
-                    );
-                    Ok(res)
-                }
-            })
+            .wrap(from_fn(force_hsts))
             // serve 'static' subfolder on disk, on the root url
             .service(
                 fs::Files::new("/", "./static")
