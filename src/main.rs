@@ -20,8 +20,7 @@ async fn answer404(req: ServiceRequest) -> actix_web::Result<ServiceResponse> {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    //mozilla_modern = tls1.3 only, we reject tls1.2 on purpose
-    let mut builder = SslAcceptor::mozilla_modern_v5(SslMethod::tls()).unwrap();
+    let mut builder = SslAcceptor::mozilla_intermediate_v5(SslMethod::tls()).unwrap();
     builder
         .set_private_key_file(
             "/etc/letsencrypt/live/mrandl.fr/privkey.pem",
