@@ -4,12 +4,13 @@ use actix_files as fs;
 use actix_web::{
     dev::{fn_service, ServiceRequest, ServiceResponse},
     http::StatusCode,
-    App, HttpServer,
+    web, App, HttpServer,
 };
 use actix_web_lab::middleware::from_fn;
 use security::force_hsts;
 
 use fs::NamedFile;
+use futures::future;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
 async fn answer404(req: ServiceRequest) -> actix_web::Result<ServiceResponse> {
@@ -33,7 +34,7 @@ async fn main() -> std::io::Result<()> {
         .set_certificate_chain_file("/etc/letsencrypt/live/mrandl.fr/fullchain.pem")
         .unwrap();
 
-    HttpServer::new(|| {
+    let server_tls = HttpServer::new(|| {
         App::new()
             // force HSTS on all outgoing http responses, tagged client-side for the next two years (=63072000s)
             .wrap(from_fn(force_hsts))
@@ -45,7 +46,17 @@ async fn main() -> std::io::Result<()> {
                     .default_handler(fn_service(answer404)),
             )
     })
-    .bind_openssl("0.0.0.0:8801", builder)?
-    .run()
-    .await
+    .bind_openssl("0.0.0.0:443", builder)?
+    .run();
+
+    // redirect http (port 80) to https (443) because I am a nice person.
+    // traffic is not encrypted until redirect is complete.
+    let server_insecure =
+        HttpServer::new(|| App::new().service(web::redirect("/", "https://mrandl.fr").permanent()))
+            .bind("0.0.0.0:80")?
+            .run();
+
+    future::try_join(server_tls, server_insecure).await?;
+
+    Ok(())
 }
