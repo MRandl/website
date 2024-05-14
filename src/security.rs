@@ -5,6 +5,7 @@ use actix_web::{
 };
 use actix_web_lab::middleware::Next;
 
+//intercepts traffic just before sending it back to client, inserts HSTS header
 pub async fn force_hsts(
     req: ServiceRequest,
     next: Next<impl MessageBody>,

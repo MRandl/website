@@ -23,20 +23,20 @@ async fn answer404(req: ServiceRequest) -> actix_web::Result<ServiceResponse> {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let mut builder = SslAcceptor::mozilla_intermediate_v5(SslMethod::tls()).unwrap();
-    builder
+    let mut tls_factory = SslAcceptor::mozilla_intermediate_v5(SslMethod::tls()).unwrap();
+    tls_factory
         .set_private_key_file(
             "/etc/letsencrypt/live/mrandl.fr/privkey.pem",
             SslFiletype::PEM,
         )
         .unwrap();
-    builder
+    tls_factory
         .set_certificate_chain_file("/etc/letsencrypt/live/mrandl.fr/fullchain.pem")
         .unwrap();
 
     let server_tls = HttpServer::new(|| {
         App::new()
-            // force HSTS on all outgoing http responses, tagged client-side for the next two years (=63072000s)
+            // force HSTS on all outgoing http responses
             .wrap(from_fn(force_hsts))
             // serve 'static' subfolder on disk, on the root url
             .service(
@@ -46,7 +46,7 @@ async fn main() -> std::io::Result<()> {
                     .default_handler(fn_service(answer404)),
             )
     })
-    .bind_openssl("0.0.0.0:443", builder)?
+    .bind_openssl("0.0.0.0:443", tls_factory)?
     .run();
 
     // redirect http (port 80) to https (443) because I am a nice person.
