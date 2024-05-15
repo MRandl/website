@@ -2,7 +2,7 @@ mod common_answers;
 mod security;
 
 use actix_files as fs;
-use actix_web::{web, App, HttpServer};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use actix_web_lab::middleware::from_fn;
 use futures::future;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
@@ -12,6 +12,8 @@ use security::force_hsts;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+
     let mut tls_factory = SslAcceptor::mozilla_intermediate_v5(SslMethod::tls()).unwrap();
     tls_factory
         .set_private_key_file(
@@ -25,6 +27,7 @@ async fn main() -> std::io::Result<()> {
 
     let server_tls = HttpServer::new(|| {
         App::new()
+            .wrap(Logger::default())
             // force HSTS tag to appear on all outgoing http responses
             .wrap(from_fn(force_hsts))
             // serve 'static' subfolder on disk, on the root url
