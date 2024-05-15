@@ -1,6 +1,9 @@
 use actix_files::NamedFile;
 use actix_web::{
-    http::{uri::Scheme, StatusCode, Uri},
+    http::{
+        uri::{Authority, Parts, Scheme},
+        StatusCode, Uri,
+    },
     HttpRequest, HttpResponse,
 };
 
@@ -12,13 +15,18 @@ pub async fn answer404(req: HttpRequest) -> actix_web::Result<HttpResponse> {
 }
 
 pub async fn redirect_to_https(req: HttpRequest) -> actix_web::Result<HttpResponse> {
-    // Create the HTTPS URL using the host from the request
-    let redirect_url = Uri::from_parts({
-        let mut parts = req.uri().clone().into_parts();
-        parts.scheme = Some(Scheme::HTTPS);
-        parts
-    })
-    .unwrap_or(Uri::from_static("https://mrandl.fr"));
+    let req_host = req.connection_info().host().to_owned();
+
+    let mut new_link = Parts::default();
+    new_link.scheme = Some(Scheme::HTTPS);
+    new_link.authority = Some(
+        Authority::from_maybe_shared(req_host)
+            .unwrap_or_else(|_| Authority::from_static("mrandl.fr")),
+    );
+    new_link.path_and_query = req.uri().path_and_query().cloned();
+
+    let redirect_url = Uri::from_parts(new_link).unwrap();
+    //.unwrap_or(Uri::from_static("https://mrandl.fr"));
 
     let response = HttpResponse::PermanentRedirect()
         .insert_header(("Location", redirect_url.to_string()))
