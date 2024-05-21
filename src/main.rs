@@ -1,15 +1,15 @@
 mod common_answers;
-mod security;
 
 use actix_files as fs;
-use actix_web::{middleware::Logger, web, App, HttpServer};
-use actix_web_lab::middleware::from_fn;
+use actix_web::{
+    middleware::{self, Logger},
+    web, App, HttpServer,
+};
 use env_logger::Env;
 use futures::future;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
 use common_answers::{answer404, redirect_to_https};
-use security::force_hsts;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -29,8 +29,18 @@ async fn main() -> std::io::Result<()> {
     let server_tls = HttpServer::new(|| {
         App::new()
             .wrap(Logger::default())
-            // force HSTS tag to appear on all outgoing http responses
-            .wrap(from_fn(force_hsts))
+            // force HSTS tag + cache locally on all outgoing http responses
+            .wrap(
+                middleware::DefaultHeaders::new()
+                    .add((
+                        actix_web::http::header::CACHE_CONTROL,
+                        "max-age=3600, public, stale-while-revalidate=604800",
+                    ))
+                    .add((
+                        actix_web::http::header::STRICT_TRANSPORT_SECURITY,
+                        "max-age=63072000; includeSubDomains; preload",
+                    )),
+            )
             // serve 'static' subfolder from disk, on the root url
             .service(
                 fs::Files::new("/", "./static")
