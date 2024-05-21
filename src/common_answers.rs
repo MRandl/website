@@ -25,8 +25,7 @@ pub async fn redirect_to_https(req: HttpRequest) -> actix_web::Result<HttpRespon
     );
     new_link.path_and_query = req.uri().path_and_query().cloned();
 
-    let redirect_url = Uri::from_parts(new_link).unwrap();
-    //.unwrap_or(Uri::from_static("https://mrandl.fr"));
+    let redirect_url = Uri::from_parts(new_link).unwrap_or(Uri::from_static("https://mrandl.fr"));
 
     let response = HttpResponse::PermanentRedirect()
         .insert_header(("Location", redirect_url.to_string()))
