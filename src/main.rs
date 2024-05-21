@@ -30,7 +30,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             // force HSTS tag to appear on all outgoing http responses
             .wrap(from_fn(force_hsts))
-            // serve 'static' subfolder on disk, on the root url
+            // serve 'static' subfolder from disk, on the root url
             .service(
                 fs::Files::new("/", "./static")
                     .index_file("index.html")
@@ -39,13 +39,13 @@ async fn main() -> std::io::Result<()> {
                     .default_handler(web::to(answer404)),
             )
     })
-    .bind_openssl("0.0.0.0:443", tls_factory)?
+    .bind_openssl("[::]:443", tls_factory)?
     .run();
 
     // Redirect all http (80) traffic to https (443) to make the google hstspreload.org thing happy
     let server_unencrypted =
         HttpServer::new(|| App::new().default_service(web::to(redirect_to_https)))
-            .bind("0.0.0.0:80")?
+            .bind("[::]:80")?
             .workers(1) // it must not impede on the other, so we limit the thread count
             .run();
 
