@@ -14,6 +14,13 @@ pub async fn answer404(req: HttpRequest) -> actix_web::Result<HttpResponse> {
     Ok(res)
 }
 
+pub async fn to_balelec() -> actix_web::Result<HttpResponse> {
+    let answer = HttpResponse::PermanentRedirect()
+        .insert_header(("Location", "https://www.balelec.ch"))
+        .finish();
+    Ok(answer)
+}
+
 pub async fn redirect_to_https(req: HttpRequest) -> actix_web::Result<HttpResponse> {
     let req_host = req.connection_info().host().to_owned();
 

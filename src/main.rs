@@ -2,6 +2,7 @@ mod common_answers;
 
 use actix_files as fs;
 use actix_web::{
+    guard::GuardContext,
     middleware::{self, Logger},
     web, App, HttpServer,
 };
@@ -9,7 +10,7 @@ use env_logger::Env;
 use futures::future;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
-use common_answers::{answer404, redirect_to_https};
+use common_answers::{answer404, redirect_to_https, to_balelec};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -40,6 +41,14 @@ async fn main() -> std::io::Result<()> {
                         actix_web::http::header::STRICT_TRANSPORT_SECURITY,
                         "max-age=63072000; includeSubDomains; preload",
                     )),
+            )
+            // redirect *.crapulerie.ch to balelec.ch
+            .route(
+                "/",
+                web::to(to_balelec).guard(|s: &GuardContext| match s.head().uri.host() {
+                    None => false,
+                    Some(s) => s.ends_with("crapulerie.ch"),
+                } && s.head().uri.path() == "/"),
             )
             // serve 'static' subfolder from disk, on the root url
             .service(
