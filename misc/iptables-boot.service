@@ -1,0 +1,14 @@
+[Unit]
+Description = iptables restore rules
+After=network.target
+Requires=network.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+RemainAfterExit=true
+ExecStart=/usr/local/sbin/iptables.sh
+
+[Install]
+WantedBy = multi-user.target

@@ -1,0 +1,14 @@
+[Unit]
+Description = website runner
+After=network.target home.mount iptables-boot.service
+Requires=network.target home.mount iptables-boot.service
+
+[Service]
+User=fedora
+Group=fedora
+ExecStart=/usr/local/sbin/website.sh
+AmbientCapabilities = CAP_NET_BIND_SERVICE
+CapabilityBoundingSet = CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy = multi-user.target
