@@ -3,4 +3,4 @@ This repo contains the source code for the mrandl.fr website.
 
 ```cargo build --release```
 # dependencies
-requires clang, lld and probably cc. It will complain if you're missing stuff, no worries.
+requires clang, lld, openssl and probably cc. It will complain if you're missing stuff, no worries.
