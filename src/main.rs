@@ -48,7 +48,7 @@ async fn main() -> std::io::Result<()> {
                 web::to(to_balelec).guard(|s: &GuardContext| match s.head().uri.host() {
                     None => false,
                     Some(s) => s.ends_with("crapulerie.ch"),
-                } && s.head().uri.path() == "/"),
+                } && (s.head().uri.path() == "/" || s.head().uri.path().is_empty())),
             )
             // serve 'static' subfolder from disk, on the root url
             .service(
