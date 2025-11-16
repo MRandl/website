@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Blog Post - M. Randl</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="style.css" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+            rel="stylesheet"
+        />
+        <!-- Markdown parser -->
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <!-- Syntax highlighting for code blocks -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body>
+        <div class="main-container max-w-4xl mx-auto p-4 sm:p-8">
+            <header class="mb-10 pt-4">
+                <h1
+                    class="text-5xl font-extrabold mb-6 tracking-tight text-white"
+                >
+                    <a
+                        href="index.html#blog"
+                        class="hover:text-indigo-400 transition-colors"
+                    >
+                        <span class="text-indigo-500">mbmr</span>.dev<span
+                            class="text-gray-400"
+                            >/blog/</span
+                        >
+                    </a>
+                </h1>
+                <nav class="flex items-center gap-4 text-sm">
+                    <a
+                        href="index.html#blog"
+                        class="text-indigo-400 hover:text-indigo-300 transition-colors"
+                    >
+                        ← Back to main website
+                    </a>
+                </nav>
+            </header>
+
+            <main class="card rounded-xl p-6 md:p-10">
+                <article id="post-content">
+                    <div class="text-gray-400 text-center py-8">
+                        Loading post...
+                    </div>
+                </article>
+            </main>
+
+            <footer
+                class="mt-12 pt-6 border-t border-gray-800 text-center text-xs text-gray-500"
+            >
+                <p>Mathis Randl. Toujours du meilleur go&ucirc;t.</p>
+            </footer>
+        </div>
+
+        <script>
+            (async function () {
+                const postContent = document.getElementById("post-content");
+                const postId = window.location.hash.substring(1);
+
+                if (!postId) {
+                    postContent.innerHTML =
+                        '<div class="text-red-400 text-center py-8">No post ID provided.</div>';
+                    return;
+                }
+
+                try {
+                    // Load metadata to get post info
+                    const metadataResponse = await fetch("blog/metadata.json");
+                    if (!metadataResponse.ok)
+                        throw new Error("Failed to load blog metadata");
+
+                    const data = await metadataResponse.json();
+                    const post = data.posts.find((p) => p.id === postId);
+
+                    if (!post) {
+                        postContent.innerHTML =
+                            '<div class="text-red-400 text-center py-8">Post not found.</div>';
+                        return;
+                    }
+
+                    // Load markdown post content
+                    const contentResponse = await fetch(
+                        `blog/posts/${postId}.md`,
+                    );
+                    if (!contentResponse.ok)
+                        throw new Error("Failed to load post content");
+
+                    const markdown = await contentResponse.text();
+
+                    // Configure marked for syntax highlighting
+                    marked.setOptions({
+                        highlight: function (code, lang) {
+                            if (lang && hljs.getLanguage(lang)) {
+                                return hljs.highlight(code, { language: lang })
+                                    .value;
+                            }
+                            return hljs.highlightAuto(code).value;
+                        },
+                        breaks: true,
+                        gfm: true,
+                    });
+
+                    // Convert markdown to HTML
+                    const content = marked.parse(markdown);
+
+                    // Format date
+                    const date = new Date(post.date).toLocaleDateString(
+                        "en-US",
+                        {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                        },
+                    );
+
+                    // Generate tags HTML
+                    const tags =
+                        post.tags && post.tags.length > 0
+                            ? post.tags
+                                  .map(
+                                      (tag) =>
+                                          `<span class="inline-block bg-indigo-900/30 text-indigo-300 px-3 py-1 rounded text-sm">${tag}</span>`,
+                                  )
+                                  .join(" ")
+                            : "";
+
+                    // Update page title
+                    document.title = `${post.title} - M. Randl`;
+
+                    // Render post
+                    postContent.innerHTML = `
+                    <header class="mb-8 pb-6 border-b border-gray-700">
+                        <h1 class="text-4xl font-bold text-white mb-4">${post.title}</h1>
+                        <div class="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+                            <time>${date}</time>
+                            ${tags ? `<div class="flex flex-wrap gap-2">${tags}</div>` : ""}
+                        </div>
+                    </header>
+                    <div class="prose prose-invert prose-indigo max-w-none">
+                        ${content}
+                    </div>
+                `;
+                } catch (error) {
+                    console.error("Error loading blog post:", error);
+                    postContent.innerHTML =
+                        '<div class="text-red-400 text-center py-8">Error loading blog post. Please try again later.</div>';
+                }
+            })();
+        </script>
+
+        <style>
+            /* Prose styling for blog content */
+            .prose {
+                color: #d1d5db;
+            }
+            .prose h1,
+            .prose h2,
+            .prose h3,
+            .prose h4,
+            .prose h5,
+            .prose h6 {
+                color: #ffffff;
+                font-weight: 600;
+                margin-top: 2em;
+                margin-bottom: 1em;
+            }
+            .prose h1 {
+                font-size: 2.25em;
+            }
+            .prose h2 {
+                font-size: 1.875em;
+            }
+            .prose h3 {
+                font-size: 1.5em;
+            }
+            .prose p {
+                margin-bottom: 1.25em;
+                line-height: 1.75;
+            }
+            .prose a {
+                color: #818cf8;
+                text-decoration: underline;
+            }
+            .prose a:hover {
+                color: #a5b4fc;
+            }
+            .prose code {
+                background-color: #1f2937;
+                padding: 0.2em 0.4em;
+                border-radius: 0.25rem;
+                font-size: 0.875em;
+                color: #f9fafb;
+            }
+            .prose pre {
+                background-color: #1f2937;
+                padding: 1em;
+                border-radius: 0.5rem;
+                overflow-x: auto;
+                margin-bottom: 1.5em;
+            }
+            .prose pre code {
+                background-color: transparent;
+                padding: 0;
+            }
+            .prose ul,
+            .prose ol {
+                margin-bottom: 1.25em;
+                padding-left: 1.5em;
+            }
+            .prose li {
+                margin-bottom: 0.5em;
+            }
+            .prose blockquote {
+                border-left: 4px solid #6366f1;
+                padding-left: 1em;
+                margin: 1.5em 0;
+                color: #9ca3af;
+                font-style: italic;
+            }
+            .prose img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 0.5rem;
+                margin: 1.5em 0;
+            }
+        </style>
+    </body>
+</html>
