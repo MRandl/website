@@ -310,7 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const key = (e.key || "").toLowerCase();
-    const map = { a: "about", c: "cv", p: "papers", b: "blog" };
+    const map = { a: "about", c: "cv", p: "papers" };
 
     if (map[key]) {
       e.preventDefault();

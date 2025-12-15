@@ -2,9 +2,9 @@
   "posts": [
     {
       "id": "2025-11-16-asserts",
-      "title": "Do not fear the assert",
-      "date": "2024-11-16",
-      "summary": "A lesson about unwarranted optimization",
+      "title": "Do not fear the assert (even in very hot code)",
+      "date": "2025-11-16",
+      "summary": "A lesson about unwarranted optimization.",
       "tags": ["performance-engineering", "simd", "rust"]
     }
   ]
