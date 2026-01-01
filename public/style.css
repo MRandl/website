@@ -1,59 +1,193 @@
 :root {
-    --bg-dark: #0a0a0a;
-    --accent-color: #6366f1;
+    --bg: #0a0a0a;
+    --card-bg: #1e2533; /* Slightly darker for better contrast */
+    --accent: #6366f1;
+    --accent-soft: rgba(99, 102, 241, 0.1);
+    --text-main: #ffffff;
+    --text-dim: #9ca3af;
+    --border: #2f3947;
+    --font: "Inter", -apple-system, system-ui, sans-serif;
+    --radius: 8px;
+    --transition: all 0.2s ease;
 }
+
+/* 1. Base Styles */
 body {
-    font-family: "Inter", sans-serif;
-    background-color: var(--bg-dark);
-    color: #d1d5db;
+    background-color: var(--bg);
+    color: var(--text-main);
+    font-family: var(--font);
+    margin: 0;
+    line-height: 1.6;
 }
+
 .main-container {
-    min-height: 100vh;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
 }
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* 2. Components: Header & Logo */
+.logo {
+    font-size: 2.5rem;
+    font-weight: 800;
+}
+.logo span {
+    color: var(--accent);
+}
+.logo .path {
+    color: #4b5563;
+}
+
+/* 3. Navigation Tabs */
+#tab-navigation {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin: 2rem 0;
+    overflow-x: auto; /* Handles mobile overflow */
+}
+
 .tab-button {
-    transition: all 0.2s ease-in-out;
-    border-bottom: 3px solid transparent;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
+    background: none;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    color: var(--text-dim);
     cursor: pointer;
-    color: #9ca3af;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.tab-button span {
+    color: var(--accent);
+    margin-right: 4px;
 }
 .tab-button.active {
-    color: #ffffff;
-    border-color: var(--accent-color);
-    background-color: rgba(99, 102, 241, 0.1);
+    color: white;
+    border-bottom-color: var(--accent);
+    background: var(--accent-soft);
 }
-.tab-button:hover:not(.active) {
-    color: #e5e7eb;
-    background-color: rgba(99, 102, 241, 0.05);
-}
+
+/* 4. Layout Cards & Sections */
 .card {
-    border: 1px solid #1f2937; /* Darker border */
-    background-color: #111827; /* Dark card background */
-    box-shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -2px rgba(0, 0, 0, 0.06);
-    /* Apply transition directly to the content-area for fade-in effect */
-    transition:
-        opacity 0.1s ease-in-out,
-        transform 0.1s ease-in-out;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    /*padding: 2.5rem;*/
 }
+
 .section-title {
-    color: var(--accent-color);
-    letter-spacing: 0.05em;
+    color: var(--accent);
     text-transform: uppercase;
-    font-weight: 700;
+    letter-spacing: 0.1em;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
 }
-/* The following keyframes are no longer strictly needed but kept as fallback for now.
-   The JS now uses inline styles to trigger the 'card' transition. */
-/* @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+
+/* 5. CV & Content Items */
+.cv-group {
+    margin-bottom: 2.5rem;
 }
-*/
+
+.group-label {
+    color: var(--accent);
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.cv-item,
+.paper-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    transition: var(--transition);
+}
+
+.paper-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.cv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.institution {
+    color: var(--accent);
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* 6. Grids */
+.skills-grid,
+.papers-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.skills-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+.papers-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+}
+
+/* 7. Typography & Utilities */
+.authors {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin: 0.5rem 0;
+}
+.note {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: #6b7280;
+}
+
+.paper-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.paper-links a {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+    background: var(--accent-soft);
+    border-radius: 4px;
+    border: 1px solid transparent;
+}
+
+.paper-links a:hover {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: var(--accent);
+    text-decoration: none;
+}
+
+footer {
+    margin: 4rem 0 2rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #4b5563;
+}

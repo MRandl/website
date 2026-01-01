@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Mathis Randl - SaCS EPFL</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="main-container">
+            <header>
+                <h1 class="logo">
+                    <span>mbmr</span>.dev<span class="path">/</span>
+                </h1>
+                <nav id="tab-navigation">
+                    <button class="tab-button" data-section="about">
+                        <span>[A]</span>bout
+                    </button>
+                    <button class="tab-button" data-section="cv">
+                        <span>[C]</span>V
+                    </button>
+                    <button class="tab-button" data-section="papers">
+                        <span>[P]</span>apers
+                    </button>
+                </nav>
+            </header>
+
+            <section id="sect-about" class="content-section">
+                {{about.html}}
+            </section>
+
+            <section id="sect-cv" class="content-section" style="display: none">
+                {{cv.html}}
+            </section>
+
+            <section
+                id="sect-papers"
+                class="content-section"
+                style="display: none"
+            >
+                {{papers.html}}
+            </section>
+
+            <footer>
+                <p>Mathis Randl. Toujours du meilleur goût.</p>
+            </footer>
+        </div>
+
+        <template id="tpl-blog">
+            <h2 class="section-title">Blog</h2>
+            <p>Coming soon...</p>
+        </template>
+
+        <script src="script.js"></script>
+    </body>
+</html>
