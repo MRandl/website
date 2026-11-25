@@ -1,8 +1,8 @@
 /* The banner, live: an IVF index answering a query that follows the cursor.
    No dependencies. Where this does not run, ivf.svg stays in place.
 
-   Three layers, so that little is painted: the cells, repainted one by one
-   when their color has visibly changed; the borders, painted once; and the
+   Three layers, so that little is painted: the cells, each repainted
+   when its color has changed; the borders, painted once; and the
    query with its neighbors. The layers never move: a page where only canvas
    pixels change spares the browser its layout and paint. Nothing runs while
    nothing changes, or while the banner is out of sight. */
@@ -17,17 +17,16 @@ const CELL_W = 92, CELL_H = 80; // average cell
 const PROBES = 4, K = 16;       // cells searched, neighbors returned
 const PACE = 45;                // speed of the stroll, units per second
 // Showing a frame costs the browser more than drawing it, so there are only 40
-// per second; during the stroll, the cells make do with every other one
+// per second
 const FRAME_MS = 1000 / 40;
 const FADE = .09;               // seconds, for cells to change color
-const STEP = 4;                 // color change (of 255) worth a repaint
 
 const rgb = h => [0, 2, 4].map(i => parseInt(h.substr(i, 2), 16));
 const RAMP = ["fff0a3", "d3e78f", "8fd19a", "46b5a4", "2290a5", "1d6793",
               "1a4675", "152f55", "101f3d"].map(rgb);
 const STOPS = [-60, 20, 130, 250, 380, 520, 670, 820, 900];
 const PROBED = rgb("ffe14d");
-const DOT_PROBED = "#101f3d", DOT_ON_DARK = "#a9d3d6", DOT_ON_LIGHT = "#2a6468";
+const DOT_PROBED = rgb("101f3d"), DOT_ON_DARK = rgb("a9d3d6"), DOT_ON_LIGHT = rgb("2a6468");
 
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
@@ -124,16 +123,12 @@ function build(width) {
         c.shape.closePath();
         c.left = Math.min(...poly.map(p => p.x));
         c.right = Math.max(...poly.map(p => p.x));
-        c.small = new Path2D();
-        c.big = new Path2D();
-        for (const p of c.points)
-            for (const [path, r] of [[c.small, 2.1], [c.big, 2.9]]) {
-                path.moveTo(p.x + r, p.y);
-                path.arc(p.x, p.y, r, 0, 2 * Math.PI);
-            }
-        c.color = null;         // where its color is, on the way to its goal
-        c.painted = null;       // the color on screen
-        c.hot = c.wasHot = false;
+        // dots are very short strokes with round caps, so their size can change
+        c.dots = new Path2D();
+        for (const p of c.points) { c.dots.moveTo(p.x, p.y); c.dots.lineTo(p.x + .01, p.y); }
+        c.look = null;          // colors of the cell and its dots, size of these
+        c.painted = null;       // the look on screen
+        c.hot = false;
     }
 }
 
@@ -177,6 +172,7 @@ function fit() {
     for (const g of [floor, walls, top]) {
         resize(g, Math.round(width * ratio), Math.round(height * ratio));
         g.setTransform(zoom, 0, 0, zoom, g.canvas.width / 2, 0);
+        g.lineCap = "round";
     }
     walls.strokeStyle = "#fff"; walls.lineWidth = 1.3; walls.lineJoin = "round";
     const borders = new Path2D();
@@ -248,25 +244,29 @@ function paintCells(dt) {
     const blend = 1 - Math.exp(-dt / FADE);
     let busy = false;
     for (const c of shown) {
-        const goal = c.hot ? PROBED : COLORS[Math.min(COLORS.length - 1, Math.round(c.d * tint))];
-        if (!c.color) c.color = goal.slice();
-        let far = 0, off = 0;
-        for (let k = 0; k < 3; k++) {
-            c.color[k] += blend * (goal[k] - c.color[k]);
-            far = Math.max(far, Math.abs(goal[k] - c.color[k]));
-            if (c.painted) off = Math.max(off, Math.abs(c.painted[k] - c.color[k]));
+        const fill = c.hot ? PROBED : COLORS[Math.min(COLORS.length - 1, Math.round(c.d * tint))];
+        const dots = c.hot ? DOT_PROBED
+            : fill[0] + fill[1] + fill[2] < 450 ? DOT_ON_DARK : DOT_ON_LIGHT;
+        const size = c.hot ? 58 : 42; // in tenths, to round like the colors
+        if (!c.look) c.look = [...fill, ...dots, size];
+        const look = c.look;
+        let changed = !c.painted;
+        if (changed) c.painted = [];
+        for (let k = 0; k < 7; k++) {
+            const goal = k < 3 ? fill[k] : k < 6 ? dots[k - 3] : size;
+            look[k] += blend * (goal - look[k]);
+            if (Math.abs(goal - look[k]) < .5) look[k] = goal;
+            else busy = true;
+            const v = Math.round(look[k]);
+            if (c.painted[k] !== v) { c.painted[k] = v; changed = true; }
         }
-        if (far < 1) for (let k = 0; k < 3; k++) c.color[k] = goal[k];
-        else busy = true;
-        if (c.painted && off < STEP && c.hot === c.wasHot) continue;
-        c.painted = c.painted || [];
-        for (let k = 0; k < 3; k++) c.painted[k] = Math.round(c.color[k]);
-        c.wasHot = c.hot;
-        floor.fillStyle = "rgb(" + c.painted + ")";
+        if (!changed) continue;
+        const v = c.painted;
+        floor.fillStyle = "rgb(" + v[0] + "," + v[1] + "," + v[2] + ")";
         floor.fill(c.shape);
-        floor.fillStyle = c.hot ? DOT_PROBED
-            : c.painted[0] + c.painted[1] + c.painted[2] < 450 ? DOT_ON_DARK : DOT_ON_LIGHT;
-        floor.fill(c.hot ? c.big : c.small);
+        floor.strokeStyle = "rgb(" + v[3] + "," + v[4] + "," + v[5] + ")";
+        floor.lineWidth = v[6] / 10;
+        floor.stroke(c.dots);
     }
     return busy;
 }
@@ -301,12 +301,12 @@ function paintQuery() {
 
 /* ---- the loop ---- */
 
-let running = false, last = -FRAME_MS, lastCells = 0, due = 0;
+let running = false, last = -FRAME_MS, due = 0;
 
 function wake() {
     if (running) return;
     running = true;
-    last = lastCells = Math.max(last, performance.now() - FRAME_MS);
+    last = Math.max(last, performance.now() - FRAME_MS);
     next();
 }
 
@@ -338,12 +338,7 @@ function frame(now) {
         search();
         paintQuery();
     }
-    let busy = true;
-    const rest = strolling && !lagX && !lagY ? 1.5 * FRAME_MS : 0;
-    if (now - lastCells >= rest || !shown[0].painted) {
-        busy = paintCells(Math.max(0, Math.min(.2, (now - lastCells) / 1000)));
-        lastCells = now;
-    }
+    const busy = paintCells(dt);
     if (!strolling && !moved && !busy) running = false; // until something happens
     else next();
 }
