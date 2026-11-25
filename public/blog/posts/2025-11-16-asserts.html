@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Do not fear the assert - M. Randl</title>
+<link rel="stylesheet" type="text/css" media="all" href="../../style.css">
+<link rel="icon" type="image/x-icon" href="../../favicon.ico">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+</head>
+<body bgcolor="#FFFFFF" text="#14233C" link="#0E6480" vlink="#3A4F86">
+
+<div class="top"><img class="map" src="../../ivf.svg" width="600" height="127"
+alt=""></div>
+
+<div class="page">
+<div class="in">
+
+<h1>mbmr<span class="dot">.dev/blog/</span></h1>
+<p class="nav"><a href="../../index.html">Back to main website</a></p>
+
+<hr>
+
+<h2>Do not fear the assert (even in very hot code)</h2>
+
+<p class="small">November 16, 2025. Filed under performance-engineering, simd,
+rust.</p>
+
+<p>One fine day, I was working on a project that involved a lot of
+vector distance computations.</p>
+
+<p>This involves taking two floating-point vectors and checking how far
+apart they are from each other. While there are plenty of options to
+compute distance, today's topic is <a
+href="https://en.wikipedia.org/wiki/Euclidean_distance">L2 (a.k.a.
+Euclidean) distance</a>. It goes roughly like this:</p>
+
+<pre># assuming v1 and v2 have the same size:
+def l2_distance(v1, v2):
+  accumulator = 0.0
+  for i in range(len(v1)):
+    accumulator += (v1[i] - v2[i]) ** 2
+  return math.sqrt(accumulator)</pre>
+
+<p>And when I mean a lot of such operations were involved, I mean quite
+a lot:</p>
+
+<p>The piece of software I was building was supposed to perform about
+100M of such vector distance comparisons per second, which means a
+budget of about 10ns per distance call, all included. With your typical
+CPU running at 3GHz, that's 30 CPU cycles of budget to run the distance
+function. And that's not really a hard limit: if we can make the latency
+twice as low, my boss is twice as happy and I'm twice as likely to keep
+my job. [1]</p>
+
+<p>At this scale, every single bit of performance you can squeeze out is
+gladly welcomed. Some common sense suggested that the bottleneck of that
+implementation is not memory (transferring data from the RAM sticks to
+the CPU) but compute (performing the subtraction and squaring
+operations). Indeed, we are nowhere near hitting the throughput
+limitation of the RAM and our access patterns are quite predictable
+(hence cache-friendly, hence latency-friendly). So ideally, we'd like to
+shift some of the load from the compute to the memory.</p>
+
+<p>The typical way to achieve that is <a
+href="https://en.wikipedia.org/wiki/Single_instruction,_multiple_data">SIMD
+instructions</a>. Instead of loading one float from each array,
+performing the numerical computation on these two numbers and storing
+the result, we do a <em>bunch</em> of these at once. We load, say, 8
+contiguous floats from each vector, subtract every element of the first
+vector from the other <em>at once</em>, square all 8 results <em>at
+once</em> and store them in 8 accumulator values <em>at once</em>. This
+makes the CPU go 8x faster. If your memory can follow (in our case, it
+can), we've successfully sped up our algorithm by a factor of 8.
+Wonderful news. I'm not getting fired.</p>
+
+<p>So, let's take a look at the actual piece of code I was working with,
+shall we?</p>
+
+<pre>// dismissing imports and other stuff
+
+// the requested amount of f32's  an SIMD register should hold at once
+const SIMD_LANECOUNT : usize = 8;
+
+// args: &amp;self and other are of type &amp;[f32], i.e. references to
+// a contiguous block of floating point numbers.
+#[inline]
+fn l2_squared(&amp;self, othr: &amp;[f32]) -&gt; f32 {
+    // sanity checks
+    assert_eq!(self.len(), othr.len());
+    assert!(self.len().is_multiple_of(SIMD_LANECOUNT));
+
+    // accumulator: 8x zero values
+    let mut intermediate_sum_lanes = Simd::&lt;f32, SIMD_LANECOUNT&gt;::splat(0.0);
+
+    // iterate on 8-sized chunks
+    let self_chunks = self.as_chunks::&lt;SIMD_LANECOUNT&gt;().0.iter();
+    let othr_chunks = othr.as_chunks::&lt;SIMD_LANECOUNT&gt;().0.iter();
+
+    for (&amp;slice_self, &amp;slice_othr) in self_chunks.zip(othr_chunks) {
+        //f32simd_slf and f32simd_oth are both 8-sized chunks of the original vector
+        let f32simd_slf = SimdF32::from_array(slice_self);
+        let f32simd_oth = SimdF32::from_array(slice_othr);
+
+        // compute element-wise difference in one CPU operation and update accumulators
+        let diff = f32simd_slf - f32simd_oth;
+        intermediate_sum_lanes += diff * diff;
+    }
+
+    // sum the 8 accumulators into 1 final floating point number
+    intermediate_sum_lanes.reduce_sum() // 8-to-1 sum
+}</pre>
+
+<p>This piece of code meets the performance targets, it is fairly
+trivially correct [2], job done. Right?</p>
+
+<p>A small devil on my shoulder says otherwise. Look at these two
+guys:</p>
+
+<pre>assert_eq!(self.len(), othr.len());
+assert!(self.len().is_multiple_of(SIMD_LANECOUNT));</pre>
+
+<p>What good are they, really? It seems quite tempting to remove them.
+We know from the benchmark runs that our vectors have a perfectly
+reasonable size. And <em>much worse</em>, they introduce extra
+instructions in our machine code. That's like, at least a CPU cycle or
+two in our budget of 30. Not nothing! Let's remove them and benchmark
+again. We'll observe the cost of these asserts in practice.</p>
+
+<pre>Asserts  | QPS   | Latency
+---------------------------
+Enabled  | 123M  | not much
+Disabled | 100M  | a bit more</pre>
+
+<p>todo replace with the actual numbers</p>
+
+<p>...</p>
+
+<p>Oops? What's happening there?</p>
+
+<p>[1] Sentence added for dramatic purposes. My <a
+href="https://people.epfl.ch/anne-marie.kermarrec">boss</a> is actually
+a very enjoyable person to be around.</p>
+
+<p>[2] I don't really care about floats not really being commutative
+wrt. addition and stuff. Here, the SIMD implementation does not perform
+the final sum of the squares in the same order as a sequential
+implementation, which leads to potential numerical instability. I don't
+consider this a correctness failure here.</p>
+
+<hr>
+
+</div>
+
+<p class="foot">Mathis Randl. Toujours du meilleur go&ucirc;t.</p>
+
+</div>
+
+</body>
+</html>
