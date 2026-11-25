@@ -31,7 +31,8 @@ const DOT_PROBED = "#101f3d", DOT_ON_DARK = "#a9d3d6", DOT_ON_LIGHT = "#2a6468";
 
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
-/* color by distance to the query, tabulated */
+/* color by distance to the query, tabulated; distances are stretched so that
+   the palette spans the banner, whatever its width */
 const COLORS = [];
 for (let d = 0, i = 1; d <= STOPS[STOPS.length - 1]; d++) {
     while (d > STOPS[i]) i++;
@@ -150,6 +151,7 @@ if (!floor || !walls || !top) return;
 
 let width = 0, height = 0, ratio = 1; // of the banner, in CSS pixels
 let scale = 1, zoom = 1;              // CSS and device pixels per unit
+let tint = 1;                         // that stretch
 let shown = [];                       // cells on screen
 let drawn = null;                     // where the top layer has been drawn on
 let stale = true;                     // has the size possibly changed?
@@ -167,6 +169,7 @@ function fit() {
     width = w; height = h; ratio = dpr;
     scale = height / HEIGHT; zoom = scale * ratio;
     reach = .42 * width / scale;
+    tint = COLORS.length / (width / scale / 2);
     if (width / scale > span) build(Math.max(width, screen.width) / scale);
     const half = width / scale / 2;
     shown = cells.filter(c => c.visible && c.right > -half && c.left < half);
@@ -245,7 +248,7 @@ function paintCells(dt) {
     const blend = 1 - Math.exp(-dt / FADE);
     let busy = false;
     for (const c of shown) {
-        const goal = c.hot ? PROBED : COLORS[Math.min(COLORS.length - 1, Math.round(c.d))];
+        const goal = c.hot ? PROBED : COLORS[Math.min(COLORS.length - 1, Math.round(c.d * tint))];
         if (!c.color) c.color = goal.slice();
         let far = 0, off = 0;
         for (let k = 0; k < 3; k++) {
