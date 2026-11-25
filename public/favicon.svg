@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-75.2 -73.8 144.0 144.0">
+<path stroke="#e5382a" stroke-width="4.5" d="M0,0 30.4,-15.9M0,0 47.4,2.2M0,0 41.8,-26.4M0,0 15.7,-51.7M0,0 57.0,7.2M0,0 -3.1,58.7M0,0 59.8,-13.3M0,0 -18.0,-59.3M0,0 25.9,-58.8M0,0 -57.2,-32.6M0,0 -66.2,10.3M0,0 -21.8,-64.3M0,0 -64.9,-20.9M0,0 -52.4,-43.8M0,0 -51.2,48.4M0,0 -38.6,60.6"/>
+<circle cx="30.4" cy="-15.9" r="8" fill="#e5382a"/>
+<circle cx="47.4" cy="2.2" r="8" fill="#e5382a"/>
+<circle cx="41.8" cy="-26.4" r="8" fill="#e5382a"/>
+<circle cx="15.7" cy="-51.7" r="8" fill="#e5382a"/>
+<circle cx="57.0" cy="7.2" r="8" fill="#e5382a"/>
+<circle cx="-3.1" cy="58.7" r="8" fill="#e5382a"/>
+<circle cx="59.8" cy="-13.3" r="8" fill="#e5382a"/>
+<circle cx="-18.0" cy="-59.3" r="8" fill="#e5382a"/>
+<circle cx="25.9" cy="-58.8" r="8" fill="#e5382a"/>
+<circle cx="-57.2" cy="-32.6" r="8" fill="#e5382a"/>
+<circle cx="-66.2" cy="10.3" r="8" fill="#e5382a"/>
+<circle cx="-21.8" cy="-64.3" r="8" fill="#e5382a"/>
+<circle cx="-64.9" cy="-20.9" r="8" fill="#e5382a"/>
+<circle cx="-52.4" cy="-43.8" r="8" fill="#e5382a"/>
+<circle cx="-51.2" cy="48.4" r="8" fill="#e5382a"/>
+<circle cx="-38.6" cy="60.6" r="8" fill="#e5382a"/>
+<circle r="18" fill="#e5382a"/>
+<circle r="7.5" fill="#fff"/>
+</svg>
