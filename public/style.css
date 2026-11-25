@@ -47,11 +47,46 @@ a:hover, a:focus { background: #ffe14d; color: #14233c; }
 .nav a { margin: 0 0.5em; }
 h1, .nav { text-align: center; }
 
-.row { position: relative; margin: 0 0 1.7em 0; }
+.row { position: relative; margin: 0 0 1.1em 0; }
 .row h3, .row h4 { margin: 0 0 0.2em 0; }
 .row p { margin: 0 0 0.25em 0; }
 .when { margin: 0; }
 .venue { color: #c22a1d; }
+
+/* papers and jobs fold down to their headings; browsers without <details>
+   simply show everything */
+summary { display: block; list-style: none; cursor: pointer; }
+summary::-webkit-details-marker { display: none; }
+details[open] summary { margin: 0 0 0.55em 0; }
+.more { margin: 0 0 0 0.2em; padding: 0 0 0 1.2em; border-left: 2px solid #9fc3c4; }
+.row .more p:last-child { margin: 0; }
+.org { display: block; }
+/* dates and venues run on after the title, until there is a margin to hang
+   them in */
+.row .when { font-weight: normal; white-space: nowrap; }
+.row h3 .when { font-size: 0.704em; }
+.row h4 .when { font-size: 0.815em; }
+.row .when br { display: none; }
+.row .when b::before { content: "\00b7\00a0"; }
+summary h3::after, summary h4::after {
+    content: "\00a0+"; color: #1d7f93; font-weight: normal;
+}
+details[open] summary h3::after, details[open] summary h4::after {
+    content: "\00a0\2212";
+}
+summary:hover h3, summary:hover h4 { color: #17708a; }
+/* hover shape is drawn behind the text, so nothing moves */
+summary { position: relative; z-index: 0; width: fit-content; }
+summary:hover::before {
+    content: ""; position: absolute; z-index: -1;
+    top: -0.5em; right: -0.69em; bottom: -0.2em; left: -0.69em;
+    background: #e3f1ee;
+    border-radius: 0.75em;
+}
+summary:has(.org):hover::before { bottom: -0.04em; }
+@supports (corner-shape: squircle) {
+    summary:hover::before { border-radius: 1.1em; corner-shape: squircle; }
+}
 
 blockquote { margin: 0 0 1.6em 0; font-size: 1.2em; font-style: italic; }
 
@@ -97,9 +132,17 @@ pre {
     .when { position: absolute; left: -14.8em; top: 0.25em;
             width: 13.4em; text-align: right; }
     .venue { top: 0.4em; }
+    .gap { display: none; }
+    .row .when { line-height: 1.6; white-space: normal; }
+    .row .when br { display: inline; }
+    .row .when b::before { content: none; }
 }
 
 @media print {
     .map, .nav { display: none; }
     body { font-size: 11pt; }
+    /* paper cannot be clicked: print the folded parts too */
+    details::details-content { content-visibility: visible; }
+    summary h3::after, details[open] summary h3::after,
+    summary h4::after, details[open] summary h4::after { content: none; }
 }
