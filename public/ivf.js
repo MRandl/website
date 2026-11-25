@@ -15,7 +15,7 @@ if (!img || !window.Path2D || !window.PointerEvent) return;
 const HEIGHT = 380;             // banner height in our units; x = 0 is the middle
 const CELL_W = 92, CELL_H = 80; // average cell
 const PROBES = 4, K = 16;       // cells searched, neighbors returned
-const PACE = 45;                // speed of the stroll, units per second
+const PACE = 112;               // speed of the stroll, units per second
 // Showing a frame costs the browser more than drawing it, so there are only 40
 // per second
 const FRAME_MS = 1000 / 40;
