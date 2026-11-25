@@ -1,59 +1,105 @@
-:root {
-    --bg-dark: #0a0a0a;
-    --accent-color: #6366f1;
-}
+/* No imports, no web fonts, no scripts. Old browsers skip the few lines
+   they do not know and still get a readable page. */
+
 body {
-    font-family: "Inter", sans-serif;
-    background-color: var(--bg-dark);
-    color: #d1d5db;
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    color: #14233c;
+    font-family: "Palatino Linotype", Palatino, "Book Antiqua",
+        "URW Palladio L", P052, Georgia, serif;
+    font-size: 118%;
+    line-height: 1.6;
 }
-.main-container {
-    min-height: 100vh;
+
+.map { display: block; width: 100%; height: auto; border: 0; }
+.in  { max-width: 34em; margin: 0 auto; padding: 1.4em 1.3em 0 1.3em; }
+
+h1, h2, h3, h4 { font-weight: normal; line-height: 1.2; margin: 0; }
+h1 { font-size: 3.4em; margin: 0 0 0.15em 0; }
+h1 .dot { color: #1d7f93; }
+h2 { font-size: 2.1em; margin: 0 0 0.5em 0; }
+h3 { font-size: 1.25em; }
+h4 { font-size: 1.08em; font-weight: bold; }
+.group { color: #17708a; margin: 1.6em 0 0.8em 0; }
+
+/* chapters: the bars own all the space around them */
+hr {
+    height: 1px;
+    margin: 2.6em 0;
+    border: 0;
+    background: #9fc3c4;
+    color: #9fc3c4;
 }
-.tab-button {
-    transition: all 0.2s ease-in-out;
-    border-bottom: 3px solid transparent;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    color: #9ca3af;
+
+p { margin: 0 0 1em 0; }
+.lead { font-size: 1.2em; line-height: 1.5; }
+.tight { margin: 0; }
+.small, .when { font-size: 0.88em; color: #4c5c73; }
+
+ul { margin: 0.35em 0 0 0; padding: 0 0 0 1.1em; }
+li { margin: 0 0 0.2em 0; }
+li::marker { color: #1d7f93; }
+
+a:link    { color: #0e6480; }
+a:visited { color: #3a4f86; }
+a:hover, a:focus { background: #ffe14d; color: #14233c; }
+.nav a { margin: 0 0.5em; }
+h1, .nav { text-align: center; }
+
+.row { position: relative; margin: 0 0 1.7em 0; }
+.row h3, .row h4 { margin: 0 0 0.2em 0; }
+.row p { margin: 0 0 0.25em 0; }
+.when { margin: 0; }
+.venue { color: #c22a1d; }
+
+blockquote { margin: 0 0 1.6em 0; font-size: 1.2em; font-style: italic; }
+
+pre, code { font-family: "Courier New", Courier, monospace; }
+pre {
+    margin: 0 0 1.3em 0;
+    padding: 1em 1.2em;
+    background: #eef6f4;
+    border-left: 4px solid #46b5a4;
+    font-size: 0.76em;
+    line-height: 1.5;
+    overflow: auto;
 }
-.tab-button.active {
-    color: #ffffff;
-    border-color: var(--accent-color);
-    background-color: rgba(99, 102, 241, 0.1);
+
+.foot {
+    margin: 0;
+    padding: 0 1.3em 2.9em 1.3em;
+    color: #4c5c73;
+    font-size: 0.88em;
+    font-style: italic;
+    text-align: center;
 }
-.tab-button:hover:not(.active) {
-    color: #e5e7eb;
-    background-color: rgba(99, 102, 241, 0.05);
+
+/* the figure stays put and the text slides over it */
+@media screen {
+    .top  { position: sticky; top: 0; z-index: 0; }
+    .page { position: relative; z-index: 1; background: #ffffff; }
 }
-.card {
-    border: 1px solid #1f2937; /* Darker border */
-    background-color: #111827; /* Dark card background */
-    box-shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -2px rgba(0, 0, 0, 0.06);
-    /* Apply transition directly to the content-area for fade-in effect */
-    transition:
-        opacity 0.1s ease-in-out,
-        transform 0.1s ease-in-out;
+
+/* crop the figure around the query rather than shrinking it */
+@media screen and (min-width: 1px) {
+    .map { height: 380px; object-fit: cover; object-position: 50% 50%; }
 }
-.section-title {
-    color: var(--accent-color);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    font-weight: 700;
+@media screen and (max-width: 40em) {
+    body { font-size: 106%; }
+    h1 { font-size: 2.7em; }
+    .map { height: 250px; }
 }
-/* The following keyframes are no longer strictly needed but kept as fallback for now.
-   The JS now uses inline styles to trigger the 'card' transition. */
-/* @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+
+/* with enough room, dates and venues hang in the left margin; the text
+   column itself stays in the middle */
+@media screen and (min-width: 75em) {
+    .when { position: absolute; left: -14.8em; top: 0.25em;
+            width: 13.4em; text-align: right; }
+    .venue { top: 0.4em; }
 }
-*/
+
+@media print {
+    .map, .nav { display: none; }
+    body { font-size: 11pt; }
+}

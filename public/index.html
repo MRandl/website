@@ -1,70 +1,262 @@
-<!doctype html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>M. Randl</title>
-        <link rel="preload" href="style.css" as="style" />
-        <link rel="preload" href="script.js" as="script" />
-        <link
-            rel="preload"
-            href="about.html"
-            as="fetch"
-            crossorigin="anonymous"
-        />
-        <link rel="preload" href="cv.html" as="fetch" crossorigin="anonymous" />
-        <link
-            rel="preload"
-            href="papers.html"
-            as="fetch"
-            crossorigin="anonymous"
-        />
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M. Randl</title>
+<link rel="stylesheet" type="text/css" media="all" href="style.css">
+</head>
+<body bgcolor="#FFFFFF" text="#14233C" link="#0E6480" vlink="#3A4F86">
 
-        <script src="https://cdn.tailwindcss.com"></script>
+<div class="top"><img class="map" src="ivf.gif" width="600" height="127"
+alt=""></div>
 
-        <link rel="stylesheet" href="style.css" />
+<div class="page">
+<div class="in">
 
-        <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
-            rel="stylesheet"
-        />
-    </head>
-    <body>
-        <div class="main-container max-w-6xl mx-auto p-4 sm:p-8">
-            <header class="mb-10 pt-4">
-                <h1
-                    class="text-5xl font-extrabold mb-6 tracking-tight text-white"
-                >
-                    <span class="text-indigo-500">mbmr</span>.dev<span
-                        class="text-gray-400"
-                        >/</span
-                    >
-                </h1>
-                <nav
-                    id="tab-navigation"
-                    class="flex flex-wrap border-b border-gray-700"
-                >
-                    <button class="tab-button" data-section="about">
-                        [<span class="text-indigo-400">A</span>]bout
-                    </button>
-                    <button class="tab-button" data-section="cv">
-                        [<span class="text-indigo-400">C</span>]V
-                    </button>
-                    <button class="tab-button" data-section="papers">
-                        [<span class="text-indigo-400">P</span>]apers
-                    </button>
-                </nav>
-            </header>
+<h1>mbmr<span class="dot">.dev/</span></h1>
 
-            <main id="content-area" class="card rounded-xl"></main>
+<p class="nav">
+<a href="#about" accesskey="a">About</a>
+<a href="#papers" accesskey="p">Papers</a>
+<a href="#cv" accesskey="c">CV</a>
+<a href="mbmr.txt" accesskey="t">Plain text</a>
+</p>
 
-            <footer
-                class="mt-12 pt-6 border-t border-gray-800 text-center text-xs text-gray-500"
-            >
-                <p>Mathis Randl. Toujours du meilleur go&ucirc;t.</p>
-            </footer>
-        </div>
+<hr>
 
-        <script src="script.js"></script>
-    </body>
+<h2><a name="about" id="about">Hello there!</a></h2>
+
+<p class="lead">Hi! I am Mathis Randl, a PhD candidate in the SaCS lab at EPFL. I work
+on approximate vector search: the algorithms and systems that find
+nearest neighbors in large collections of embeddings.</p>
+
+<p>My main projects start from the observation that real-world queries
+tend to look like each other. Proximity is a cache that reuses the
+results of similar past queries, and CatapultDB uses past queries to
+start graph searches closer to their destination.</p>
+
+<p>I also collaborate on searching data that is spread over many owners
+(federated and decentralized search), and on measuring what privacy
+costs in vector search.</p>
+
+<p>This website is meant to store my CV/resume, as well as archive
+papers, blog posts and announcements related to my professional works.
+Feel free to explore around!</p>
+
+<p>You can also find me on
+<a href="https://www.linkedin.com/in/mathis-randl/">LinkedIn</a>,
+<a href="https://github.com/MRandl">GitHub</a> and
+<a href="https://scholar.google.com/citations?user=nOFQsNYAAAAJ">Google
+Scholar</a>.</p>
+
+<hr>
+
+<h2><a name="papers" id="papers">Publications</a></h2>
+
+<p class="small">(Authors typically listed alphabetically)</p>
+
+<h3 class="group">Main contributor</h3>
+
+<div class="row">
+<h3>Catapults to the Rescue: Accelerating Vector Search by Exploiting
+Query Locality</h3>
+<p class="when venue">Middleware '26</p>
+<p>S. Abuzakuk, A.-M. Kermarrec, R. Pires, <b>M.&nbsp;Randl</b>,
+M.&nbsp;de&nbsp;Vos</p>
+<p>Designed, programmed and benchmarked CatapultDB, a graph-based vector
+search engine with support for dynamic index mutations, more than
+doubling the throughput of DiskANN.</p>
+<p class="tight">
+<a href="https://arxiv.org/pdf/2603.02164">PDF</a>,
+<a href="https://github.com/MRandl/catapult-db/tree/main">code</a>,
+<a href="https://arxiv.org/abs/2603.02164">arXiv</a>
+</p>
+</div>
+
+<div class="row">
+<h3>Leveraging Approximate Caching for Faster Retrieval-Augmented
+Generation</h3>
+<p class="when venue">Middleware '25</p>
+<p>S. Bergman, A.-M. Kermarrec, D. Petrescu, R. Pires,
+<b>M.&nbsp;Randl</b>, M.&nbsp;de&nbsp;Vos, J.&nbsp;Zhang</p>
+<p>Designed, programmed and benchmarked Proximity, an LSH-based cache
+that serves vector search queries before they reach the vector DB. It
+reduces the number of calls by more than 75% on workloads with
+real-world locality, with no loss in recall.</p>
+<p class="tight">
+<a href="https://arxiv.org/pdf/2503.05530">PDF</a>,
+<a href="https://github.com/sacs-epfl/proximity">code</a>,
+<a href="https://docs.google.com/presentation/d/1uh6doXLMU9UD-yMJ01Fu37wS_4cLscPRRmgAyiYHLHQ/edit?usp=sharing">slides</a>,
+<a href="https://arxiv.org/abs/2503.05530">arXiv</a>,
+<a href="https://dl.acm.org/doi/10.1145/3721462.3770776">ACM Digital
+Library</a>
+</p>
+</div>
+
+<h3 class="group">Other publications</h3>
+
+<div class="row">
+<h3>Efficient Federated Search for Retrieval-Augmented Generation using
+Lightweight Routing</h3>
+<p class="when venue">DAIS '26<br>
+<b>Best paper award</b></p>
+<p>R. Guerraoui, A.-M. Kermarrec, D. Petrescu, R. Pires,
+<b>M.&nbsp;Randl</b>, M.&nbsp;de&nbsp;Vos</p>
+<p>
+<a href="https://arxiv.org/pdf/2502.19280">PDF</a>,
+<a href="https://arxiv.org/abs/2502.19280">arXiv</a>
+</p>
+<p class="tight">Earlier version (RagRoute) at EuroMLSys '25:
+<a href="https://euromlsys.eu/pdf/19_PS14.pdf">slides</a>,
+<a href="https://dl.acm.org/doi/10.1145/3721146.3721942?cid=99661548455">ACM
+(authorized link)</a>
+</p>
+</div>
+
+<div class="row">
+<h3>ZeroRAG: Adaptive Semantic Peer Routing for Decentralized
+Retrieval-Augmented Generation</h3>
+<p class="when venue">Middleware '26</p>
+<p>P. Neague, Q. Stokkink, M.&nbsp;de&nbsp;Vos, R. Pires, <b>M.&nbsp;Randl</b>,
+A.-M. Kermarrec, J.&nbsp;Pouwelse</p>
+<p class="tight">
+<a href="https://arxiv.org/pdf/2611.07928">PDF</a>,
+<a href="https://arxiv.org/abs/2611.07928">arXiv</a>
+</p>
+</div>
+
+<div class="row">
+<h3>Effective LoRA Adapter Routing using Task Representations</h3>
+<p class="when venue">EACL '27 (Findings)</p>
+<p>A. Dhasade, A.-M. Kermarrec, I. Pavlovic, D. Petrescu, R. Pires,
+<b>M.&nbsp;Randl</b>, M.&nbsp;de&nbsp;Vos</p>
+<p class="tight">
+<a href="https://arxiv.org/pdf/2601.21795">PDF</a>,
+<a href="https://arxiv.org/abs/2601.21795">arXiv</a>
+</p>
+</div>
+
+<div class="row">
+<h3>Harvesting Expert-Parallel Bubbles for Fine-Tuning</h3>
+<p class="when venue">Preprint, 2026</p>
+<p>O. Balmau, S. Banka, J. Chen, A.-M. Kermarrec, R. N. Prabhu, R. Pires,
+<b>M.&nbsp;Randl</b>, M.&nbsp;de&nbsp;Vos</p>
+<p>ArXiv preprint, under conference submission.</p>
+<p class="tight">
+<a href="https://arxiv.org/pdf/2611.24496">PDF</a>,
+<a href="https://arxiv.org/abs/2611.24496">arXiv</a>
+</p>
+</div>
+
+<div class="row">
+<h3>A Unified Benchmark for Privacy-preserving Vector Search</h3>
+<p class="when venue">Preprint, 2026</p>
+<p>A.-M. Kermarrec, R. Pires, <b>M.&nbsp;Randl</b>, M.&nbsp;de&nbsp;Vos</p>
+<p>ArXiv preprint, under conference submission.</p>
+<p class="tight">
+<a href="https://arxiv.org/pdf/2608.01192">PDF</a>,
+<a href="https://arxiv.org/abs/2608.01192">arXiv</a>
+</p>
+</div>
+
+<div class="row">
+<h3>#TeamFollowBack: Detection &amp; Analysis of Follow Back Accounts on
+Social Media</h3>
+<p class="when venue">ICWSM '24</p>
+<p>T. Elmas, <b>M.&nbsp;Randl</b>, Y. Attia</p>
+<p>(A trip back to my dark data science era)</p>
+<p class="tight">
+<a href="https://arxiv.org/pdf/2403.15856">PDF</a>,
+<a href="https://arxiv.org/abs/2403.15856">arXiv</a>,
+<a href="https://ojs.aaai.org/index.php/ICWSM/article/view/31321">AAAI
+library</a>
+</p>
+</div>
+
+<hr>
+
+<h2><a name="cv" id="cv">Curriculum Vitae</a></h2>
+
+<p>PhD Candidate in Computer Science at EPFL / Vector Search &amp; RAG /
+Systems Programming. For research, see
+<a href="#papers">Publications</a>.</p>
+
+<h3 class="group">Education</h3>
+
+<div class="row">
+<h4>Ph.D. in Computer Science</h4>
+<p class="tight">EPFL (Scalable Computing Systems Lab / EDIC Fellow)</p>
+<p class="when">2024 - present</p>
+<p class="tight">Algorithms and systems for approximate nearest-neighbor
+search. Advised by Prof. Anne-Marie Kermarrec.</p>
+</div>
+
+<div class="row">
+<h4>M.Sc. in Data Science</h4>
+<p class="tight">EPFL (GPA 5.58 / 6)</p>
+<p class="when">2021 - 2024</p>
+</div>
+
+<div class="row">
+<h4>B.Sc. in Computer Science</h4>
+<p class="tight">EPFL (GPA 5.10 / 6)</p>
+<p class="when">2018 - 2021</p>
+</div>
+
+<h3 class="group">Experience</h3>
+
+<div class="row">
+<h4>Vice-President &amp; IT Manager</h4>
+<p class="tight">EPFL Student Branch of IEEE</p>
+<p class="when">2023 - 2024</p>
+<p class="tight">Organized campus talks, meetings and congresses (e.g.
+WESYP 2023) for the EPFL branch of IEEE. IT Manager since April 2023,
+Vice-President since September 2023.</p>
+</div>
+
+<div class="row">
+<h4>Software Engineering Intern</h4>
+<p class="tight">D-Tree Zambia</p>
+<p class="when">2023</p>
+<p class="tight">Programmed and deployed a new Android-native national
+platform coordinating HIV-related healthcare information, in
+collaboration with the Zambian Ministry of Health.</p>
+</div>
+
+<div class="row">
+<h4>IT Manager</h4>
+<p class="tight"><a href="https://www.balelec.ch">Festival
+Bal&eacute;lec</a></p>
+<p class="when">2022 - 2023</p>
+<p class="tight">Maintained the IT infrastructure for a campus music
+festival welcoming 15k+ people.</p>
+</div>
+
+<h3 class="group">Skills &amp; PLs</h3>
+
+<ul>
+<li>Programming languages: Rust, C, C++, Python</li>
+<li>Systems: Linux perf. engineering, tracing &amp; profiling</li>
+<li>ML/IR: vector search, ANN, RAG, federated search</li>
+</ul>
+
+<h3 class="group">Languages &amp; Personal</h3>
+
+<ul>
+<li>Spoken languages: French (native), English (fluent), German
+(learning)</li>
+<li>French and Austrian citizen</li>
+</ul>
+
+<hr>
+
+</div>
+
+<p class="foot">Mathis Randl. Toujours du meilleur go&ucirc;t.</p>
+
+</div>
+
+</body>
 </html>

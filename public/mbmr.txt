@@ -1,0 +1,162 @@
+MBMR.DEV
+========
+
+Hello there!
+------------
+
+Hi! I am Mathis Randl, a PhD candidate in the SaCS lab at EPFL. I work
+on approximate vector search: the algorithms and systems that find
+nearest neighbors in large collections of embeddings.
+
+My main projects start from the observation that real-world queries
+tend to look like each other. Proximity is a cache that reuses the
+results of similar past queries, and CatapultDB uses past queries to
+start graph searches closer to their destination.
+
+I also collaborate on searching data that is spread over many owners
+(federated and decentralized search), and on measuring what privacy
+costs in vector search.
+
+This website is meant to store my CV/resume, as well as archive papers,
+blog posts and announcements related to my professional works. Feel free
+to explore around!
+
+LinkedIn:  https://www.linkedin.com/in/mathis-randl/
+GitHub:    https://github.com/MRandl
+Scholar:   https://scholar.google.com/citations?user=nOFQsNYAAAAJ
+
+
+Publications
+------------
+
+(Authors typically listed alphabetically)
+
+MAIN CONTRIBUTOR
+
+Catapults to the Rescue: Accelerating Vector Search by Exploiting Query
+Locality (Middleware '26)
+  S. Abuzakuk, A.-M. Kermarrec, R. Pires, M. Randl, M. de Vos
+  Designed, programmed and benchmarked CatapultDB, a graph-based vector
+  search engine with support for dynamic index mutations, more than
+  doubling the throughput of DiskANN.
+  PDF:     https://arxiv.org/pdf/2603.02164
+  Code:    https://github.com/MRandl/catapult-db/tree/main
+  arXiv:   https://arxiv.org/abs/2603.02164
+
+Leveraging Approximate Caching for Faster Retrieval-Augmented Generation
+(Middleware '25)
+  S. Bergman, A.-M. Kermarrec, D. Petrescu, R. Pires, M. Randl,
+  M. de Vos, J. Zhang
+  Designed, programmed and benchmarked Proximity, an LSH-based cache
+  that serves vector search queries before they reach the vector DB. It
+  reduces the number of calls by more than 75% on workloads with
+  real-world locality, with no loss in recall.
+  PDF:     https://arxiv.org/pdf/2503.05530
+  Code:    https://github.com/sacs-epfl/proximity
+  arXiv:   https://arxiv.org/abs/2503.05530
+  ACM:     https://dl.acm.org/doi/10.1145/3721462.3770776
+  Slides:  https://docs.google.com/presentation/d/
+           1uh6doXLMU9UD-yMJ01Fu37wS_4cLscPRRmgAyiYHLHQ/edit?usp=sharing
+           (one address, split over two lines)
+
+OTHER PUBLICATIONS
+
+Efficient Federated Search for Retrieval-Augmented Generation using
+Lightweight Routing (DAIS '26, best paper award)
+  R. Guerraoui, A.-M. Kermarrec, D. Petrescu, R. Pires, M. Randl,
+  M. de Vos
+  PDF:     https://arxiv.org/pdf/2502.19280
+  arXiv:   https://arxiv.org/abs/2502.19280
+  Earlier version (RagRoute) at EuroMLSys '25:
+  ACM:     https://dl.acm.org/doi/10.1145/3721146.3721942?cid=99661548455
+           (authorized link)
+  Slides:  https://euromlsys.eu/pdf/19_PS14.pdf
+
+ZeroRAG: Adaptive Semantic Peer Routing for Decentralized
+Retrieval-Augmented Generation (Middleware '26)
+  P. Neague, Q. Stokkink, M. de Vos, R. Pires, M. Randl,
+  A.-M. Kermarrec, J. Pouwelse
+  PDF:     https://arxiv.org/pdf/2611.07928
+  arXiv:   https://arxiv.org/abs/2611.07928
+
+Effective LoRA Adapter Routing using Task Representations
+(Findings of EACL '27)
+  A. Dhasade, A.-M. Kermarrec, I. Pavlovic, D. Petrescu, R. Pires,
+  M. Randl, M. de Vos
+  PDF:     https://arxiv.org/pdf/2601.21795
+  arXiv:   https://arxiv.org/abs/2601.21795
+
+Harvesting Expert-Parallel Bubbles for Fine-Tuning (2026)
+  O. Balmau, S. Banka, J. Chen, A.-M. Kermarrec, R. N. Prabhu,
+  R. Pires, M. Randl, M. de Vos
+  ArXiv preprint, under conference submission.
+  PDF:     https://arxiv.org/pdf/2611.24496
+  arXiv:   https://arxiv.org/abs/2611.24496
+
+A Unified Benchmark for Privacy-preserving Vector Search (2026)
+  A.-M. Kermarrec, R. Pires, M. Randl, M. de Vos
+  ArXiv preprint, under conference submission.
+  PDF:     https://arxiv.org/pdf/2608.01192
+  arXiv:   https://arxiv.org/abs/2608.01192
+
+#TeamFollowBack: Detection & Analysis of Follow Back Accounts on Social
+Media (ICWSM '24)
+  T. Elmas, M. Randl, Y. Attia
+  (A trip back to my dark data science era)
+  PDF:     https://arxiv.org/pdf/2403.15856
+  arXiv:   https://arxiv.org/abs/2403.15856
+  AAAI:    https://ojs.aaai.org/index.php/ICWSM/article/view/31321
+
+
+Curriculum Vitae
+----------------
+
+PhD Candidate in Computer Science at EPFL / Vector Search & RAG /
+Systems Programming. For research, see Publications.
+
+EDUCATION
+
+Ph.D. in Computer Science, 2024 - present
+EPFL (Scalable Computing Systems Lab / EDIC Fellow)
+  Algorithms and systems for approximate nearest-neighbor search.
+  Advised by Prof. Anne-Marie Kermarrec.
+
+M.Sc. in Data Science, 2021 - 2024
+EPFL (GPA 5.58 / 6)
+
+B.Sc. in Computer Science, 2018 - 2021
+EPFL (GPA 5.10 / 6)
+
+EXPERIENCE
+
+Vice-President & IT Manager, 2023 - 2024
+EPFL Student Branch of IEEE
+  Organized campus talks, meetings and congresses (e.g. WESYP 2023) for
+  the EPFL branch of IEEE. IT Manager since April 2023, Vice-President
+  since September 2023.
+
+Software Engineering Intern, 2023
+D-Tree Zambia
+  Programmed and deployed a new Android-native national platform
+  coordinating HIV-related healthcare information, in collaboration with
+  the Zambian Ministry of Health.
+
+IT Manager, 2022 - 2023
+Festival Balelec, https://www.balelec.ch
+  Maintained the IT infrastructure for a campus music festival welcoming
+  15k+ people.
+
+SKILLS & PLS
+
+  - Programming languages: Rust, C, C++, Python
+  - Systems: Linux perf. engineering, tracing & profiling
+  - ML/IR: vector search, ANN, RAG, federated search
+
+LANGUAGES & PERSONAL
+
+  - Spoken languages: French (native), English (fluent), German
+    (learning)
+  - French and Austrian citizen
+
+
+Mathis Randl. Toujours du meilleur gout.
