@@ -1,5 +1,6 @@
-/* No imports, no web fonts, no scripts. Old browsers skip the few lines
-   they do not know and still get a readable page. */
+/* No imports, no web fonts. The only script brings the banner to life; without
+   it the banner is a still image. Old browsers skip the few lines they do
+   not know and still get a readable page. */
 
 body {
     margin: 0;
