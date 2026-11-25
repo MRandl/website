@@ -16,9 +16,9 @@ const HEIGHT = 380;             // banner height in our units; x = 0 is the midd
 const CELL_W = 92, CELL_H = 80; // average cell
 const PROBES = 4, K = 16;       // cells searched, neighbors returned
 const PACE = 45;                // speed of the stroll, units per second
-// Showing a frame costs the browser more than drawing it, so there are only 24
+// Showing a frame costs the browser more than drawing it, so there are only 40
 // per second; during the stroll, the cells make do with every other one
-const FRAME_MS = 1000 / 24;
+const FRAME_MS = 1000 / 40;
 const FADE = .09;               // seconds, for cells to change color
 const STEP = 4;                 // color change (of 255) worth a repaint
 
@@ -298,18 +298,21 @@ function paintQuery() {
 
 /* ---- the loop ---- */
 
-let running = false, last = -FRAME_MS, lastCells = 0;
+let running = false, last = -FRAME_MS, lastCells = 0, due = 0;
 
 function wake() {
     if (running) return;
     running = true;
-    const now = performance.now(), wait = Math.max(0, FRAME_MS - (now - last));
-    last = lastCells = now + wait - FRAME_MS;
-    next(wait);
+    last = lastCells = Math.max(last, performance.now() - FRAME_MS);
+    next();
 }
 
-function next(wait) {
-    setTimeout(requestAnimationFrame, wait, frame);
+/* frames keep to a schedule, so that rounding to the screen's refreshes does
+   not add up; the timer is a little early, not to miss one */
+function next() {
+    const now = performance.now();
+    due = Math.max(due + FRAME_MS, now);
+    setTimeout(requestAnimationFrame, due - now - 4, frame);
 }
 
 function frame(now) {
@@ -318,7 +321,7 @@ function frame(now) {
         running = false;
         return;
     }
-    const dt = Math.max(0, Math.min(.05, (now - last) / 1000));
+    const dt = Math.max(0, Math.min(.1, (now - last) / 1000));
     last = now;
     const strolling = !cursor && !calm();
     if (strolling) phase = (phase + dt * PACE / reach) % (2 * Math.PI);
@@ -339,7 +342,7 @@ function frame(now) {
         lastCells = now;
     }
     if (!strolling && !moved && !busy) running = false; // until something happens
-    else next(FRAME_MS);
+    else next();
 }
 
 box.className = img.className;
