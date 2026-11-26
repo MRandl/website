@@ -221,13 +221,30 @@ let triangles = 0, walls = 0, spots = 0;
 let drawn = false;
 let stale = true;
 
+const MAX_PIXELS = 12e6;
+const MAX_SIDE = Math.min(8192, gl.getParameter(gl.MAX_RENDERBUFFER_SIZE),
+                          ...gl.getParameter(gl.MAX_VIEWPORT_DIMS));
+
+// Device pixels per CSS pixel, pinch zoom included, rounded up to quarter
+// steps of a power of two so a pinch gesture doesn't reallocate every frame.
+function density(w, h) {
+    const pinch = window.visualViewport ? visualViewport.scale : 1;
+    const want = Math.max(1, (window.devicePixelRatio || 1) * Math.max(1, pinch));
+    const step = Math.pow(2, Math.ceil(4 * Math.log2(want)) / 4);
+    return Math.min(step, MAX_SIDE / w, MAX_SIDE / h, Math.sqrt(MAX_PIXELS / (w * h)));
+}
+
 function fit() {
     stale = false;
     const w = box.clientWidth, h = box.clientHeight;
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    if (w === width && h === height && dpr === ratio || !w || !h) return;
-    width = w; height = h; ratio = dpr;
-    scale = height / HEIGHT; zoom = scale * ratio;
+    if (!w || !h) return;
+    const dpr = density(w, h);
+    if (w === width && h === height) {
+        if (dpr !== ratio) resolve(dpr);
+        return;
+    }
+    width = w; height = h;
+    scale = height / HEIGHT;
     reach = .42 * width / scale;
     tint = COLORS.length / (width / scale / 2);
     if (width / scale > span) build(Math.max(width, screen.width) / scale);
@@ -266,13 +283,19 @@ function fit() {
     upload(dotSeg, dots, gl.STATIC_DRAW);
     dotStyles = new Float32Array(4 * spots);
 
-    canvas.width = Math.round(width * ratio);
-    canvas.height = Math.round(height * ratio);
-    gl.viewport(0, 0, canvas.width, canvas.height);
     for (const prog of [flat, capsule]) {
         gl.useProgram(prog.p);
         gl.uniform2f(prog.u_k, 2 * scale / width, 2 * scale / height);
     }
+    resolve(dpr);
+}
+
+function resolve(dpr) {
+    ratio = dpr; zoom = scale * ratio;
+    canvas.width = Math.round(width * ratio);
+    canvas.height = Math.round(height * ratio);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.useProgram(capsule.p);
     gl.uniform1f(capsule.u_px, 1 / zoom);
     drawn = false;
 }
@@ -498,6 +521,7 @@ for (const type of ["pointerleave", "pointercancel"]) box.addEventListener(type,
 window.addEventListener("scroll", wake, { passive: true });
 const remeasure = () => { stale = true; wake(); };
 window.addEventListener("resize", remeasure);
+if (window.visualViewport) visualViewport.addEventListener("resize", remeasure);
 if (window.ResizeObserver) new ResizeObserver(remeasure).observe(box);
 if (motion && motion.addEventListener) motion.addEventListener("change", wake);
 wake();
