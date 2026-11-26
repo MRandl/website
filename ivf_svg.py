@@ -3,7 +3,7 @@ from collections import defaultdict
 rng=np.random.default_rng(int(sys.argv[2]))
 SC=2; W,H=1800*SC,380*SC
 hexa=lambda h:np.array([int(h[i:i+2],16) for i in(0,2,4)],float)
-RAMP=[hexa(x) for x in('fff0a3','d3e78f','8fd19a','46b5a4','2290a5','1d6793','1a4675','152f55','101f3d')]
+RAMP=[hexa(x) for x in('fff0a3','d9f284','87d994','38c3ae','129bb5','0e6ba2','0f4680','0d2d5d','0a1d43')]
 POS=[-60,20,130,250,380,520,670,820,900]
 ramp=lambda d:np.array([np.interp(d,POS,[c[i] for c in RAMP]) for i in range(3)])
 cw=92*SC; rh=80*SC
@@ -76,7 +76,7 @@ o=[f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0
 for c,v in fills.items(): o.append(f'<path fill="{c}" d="{wrap(v)}"/>')
 o+=[f'<path fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" d="{wrap(edges)}"/>',
  '<g fill="none" stroke-linecap="round">']
-for k,w,c in(('l',4.2,'#a9d3d6'),('d',4.2,'#2a6468'),('p',5.8,'#101f3d')):
+for k,w,c in(('l',4.2,'#a3d8dc'),('d',4.2,'#226b70'),('p',5.8,'#0a1d43')):
     o.append(f'<path stroke="{c}" stroke-width="{w}" d="{wrap(dots[k])}"/>')
 q=f'cx="{num(Q[0])}" cy="{num(Q[1])}"'
 o+=[f'<circle {q} r="{rk:.2f}" stroke="#000" stroke-opacity=".27" stroke-width="1.1" stroke-linecap="butt" stroke-dasharray="{.58*arc:.4f} {.42*arc:.4f}" stroke-dashoffset="{-.21*arc:.4f}"/>',

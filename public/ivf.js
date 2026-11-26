@@ -12,11 +12,11 @@ const FRAME_MS = 1000 / 40;
 const FADE = .09;
 
 const rgb = h => [0, 2, 4].map(i => parseInt(h.substr(i, 2), 16));
-const RAMP = ["fff0a3", "d3e78f", "8fd19a", "46b5a4", "2290a5", "1d6793",
-              "1a4675", "152f55", "101f3d"].map(rgb);
+const RAMP = ["fff0a3", "d9f284", "87d994", "38c3ae", "129bb5", "0e6ba2",
+              "0f4680", "0d2d5d", "0a1d43"].map(rgb);
 const STOPS = [-60, 20, 130, 250, 380, 520, 670, 820, 900];
 const PROBED = rgb("ffe14d");
-const DOT_PROBED = rgb("101f3d"), DOT_ON_DARK = rgb("a9d3d6"), DOT_ON_LIGHT = rgb("2a6468");
+const DOT_PROBED = rgb("0a1d43"), DOT_ON_DARK = rgb("a3d8dc"), DOT_ON_LIGHT = rgb("226b70");
 
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
