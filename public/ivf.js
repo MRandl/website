@@ -490,7 +490,7 @@ canvas.addEventListener("webglcontextrestored", () => {
 box.className = img.className;
 box.setAttribute("aria-hidden", "true");
 box.style.cssText = "position:relative;overflow:hidden;cursor:none;"
-    + "touch-action:pan-y";
+    + "touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none";
 img.parentNode.replaceChild(box, img);
 
 for (const type of ["pointerenter", "pointerdown", "pointermove"]) box.addEventListener(type, follow);
