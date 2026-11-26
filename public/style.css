@@ -1,7 +1,3 @@
-/* No imports, no web fonts. The only script brings the banner to life; without
-   it the banner is a still image. Old browsers skip the few lines they do
-   not know and still get a readable page. */
-
 body {
     margin: 0;
     padding: 0;
@@ -24,7 +20,6 @@ h3 { font-size: 1.25em; }
 h4 { font-size: 1.08em; font-weight: bold; }
 .group { color: #17708a; margin: 1.6em 0 0.8em 0; }
 
-/* chapters: the bars own all the space around them */
 hr {
     height: 1px;
     margin: 2.6em 0;
@@ -54,16 +49,12 @@ h1, .nav { text-align: center; }
 .when { margin: 0; }
 .venue { color: #c22a1d; }
 
-/* papers and jobs fold down to their headings; browsers without <details>
-   simply show everything */
 summary { display: block; list-style: none; cursor: pointer; }
 summary::-webkit-details-marker { display: none; }
 details[open] summary { margin: 0 0 0.55em 0; }
 .more { margin: 0 0 0 0.2em; padding: 0 0 0 1.2em; border-left: 2px solid #9fc3c4; }
 .row .more p:last-child { margin: 0; }
 .org { display: block; }
-/* dates and venues run on after the title, until there is a margin to hang
-   them in */
 .row .when { font-weight: normal; white-space: nowrap; }
 .row h3 .when { font-size: 0.704em; }
 .row h4 .when { font-size: 0.815em; }
@@ -76,7 +67,6 @@ details[open] summary h3::after, details[open] summary h4::after {
     content: "\00a0\2212";
 }
 summary:hover h3, summary:hover h4 { color: #17708a; }
-/* hover shape is drawn behind the text, so nothing moves */
 summary { position: relative; z-index: 0; width: fit-content; }
 summary:hover::before {
     content: ""; position: absolute; z-index: -1;
@@ -111,13 +101,11 @@ pre {
     text-align: center;
 }
 
-/* the figure stays put and the text slides over it */
 @media screen {
     .top  { position: sticky; top: 0; z-index: 0; }
     .page { position: relative; z-index: 1; background: #ffffff; }
 }
 
-/* crop the figure around the query rather than shrinking it */
 @media screen and (min-width: 1px) {
     .map { height: 380px; object-fit: cover; object-position: 50% 50%; }
 }
@@ -127,8 +115,6 @@ pre {
     .map { height: 250px; }
 }
 
-/* with enough room, dates and venues hang in the left margin; the text
-   column itself stays in the middle */
 @media screen and (min-width: 75em) {
     .when { position: absolute; left: -14.8em; top: 0.25em;
             width: 13.4em; text-align: right; }
@@ -142,7 +128,6 @@ pre {
 @media print {
     .map, .nav { display: none; }
     body { font-size: 11pt; }
-    /* paper cannot be clicked: print the folded parts too */
     details::details-content { content-visibility: visible; }
     summary h3::after, details[open] summary h3::after,
     summary h4::after, details[open] summary h4::after { content: none; }

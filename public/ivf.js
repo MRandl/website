@@ -1,26 +1,15 @@
-/* The banner, live: an IVF index answering a query that follows the cursor.
-   No dependencies. Where this does not run, ivf.svg stays in place.
-
-   Drawn by the graphics card, with WebGL, on one opaque canvas at the screen's
-   own resolution, which the browser can show as it is. The shapes are sent
-   to the card once; at each frame only the colors of the cells and of their
-   points go, and the query. The canvas never moves: a page where only canvas
-   pixels change spares the browser its layout and paint. Nothing runs while
-   nothing changes, or while the banner is out of sight. */
 (function () {
 "use strict";
 
 const img = document.querySelector("img.map");
 if (!img || !window.PointerEvent || !window.Float32Array) return;
 
-const HEIGHT = 380;             // banner height in our units; x = 0 is the middle
-const CELL_W = 92, CELL_H = 80; // average cell
-const PROBES = 4, K = 16;       // cells searched, neighbors returned
-const PACE = 112;               // speed of the stroll, units per second
-// Showing a frame costs the browser more than drawing it, so there are only 40
-// per second
+const HEIGHT = 380;
+const CELL_W = 92, CELL_H = 80;
+const PROBES = 4, K = 16;
+const PACE = 112;
 const FRAME_MS = 1000 / 40;
-const FADE = .09;               // seconds, for cells to change color
+const FADE = .09;
 
 const rgb = h => [0, 2, 4].map(i => parseInt(h.substr(i, 2), 16));
 const RAMP = ["fff0a3", "d3e78f", "8fd19a", "46b5a4", "2290a5", "1d6793",
@@ -31,8 +20,6 @@ const DOT_PROBED = rgb("101f3d"), DOT_ON_DARK = rgb("a9d3d6"), DOT_ON_LIGHT = rg
 
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
-/* color by distance to the query, tabulated; distances are stretched so that
-   the palette spans the banner, whatever its width */
 const COLORS = [];
 for (let d = 0, i = 1; d <= STOPS[STOPS.length - 1]; d++) {
     while (d > STOPS[i]) i++;
@@ -40,16 +27,13 @@ for (let d = 0, i = 1; d <= STOPS[STOPS.length - 1]; d++) {
     COLORS.push(RAMP[i].map((v, k) => RAMP[i - 1][k] + t * (v - RAMP[i - 1][k])));
 }
 
-/* ---- the index ---- */
-
-let cells, span = 0;            // span: width the index covers
+let cells, span = 0;
 
 function uniform(a, b) { return a + Math.random() * (b - a); }
 function normal() {
     return Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random());
 }
 
-/* nearest cell of p, and by how much it beats the runner-up */
 function assign(p) {
     let best = null, d1 = Infinity, d2 = Infinity;
     for (const c of cells) {
@@ -60,8 +44,6 @@ function assign(p) {
     return { cell: best, margin: d2 - d1 };
 }
 
-/* Voronoi cell of c: a box cut by the bisector with every other centroid,
-   nearest first, until they are too far to matter */
 function voronoi(c) {
     const x = span / 2 + 8, y0 = -8, y1 = HEIGHT + 8;
     let poly = [{ x: -x, y: y0 }, { x: x, y: y0 }, { x: x, y: y1 }, { x: -x, y: y1 }];
@@ -99,7 +81,6 @@ function build(width) {
         for (let n = Math.floor(uniform(11, 18)); n > 0; n--)
             points.push({ x: c.x + normal() * .27 * CELL_W, y: c.y + normal() * .27 * CELL_W });
 
-    // a little k-means, as a real index would do
     for (let round = 0; round < 3; round++) {
         for (const c of cells) c.sx = c.sy = c.n = 0;
         for (const p of points) {
@@ -109,7 +90,6 @@ function build(width) {
         for (const c of cells) if (c.n) { c.x = c.sx / c.n; c.y = c.sy / c.n; }
     }
 
-    // keep the points that are legible: off the borders and off each other
     for (const c of cells) c.points = [];
     for (const p of points) {
         const a = assign(p);
@@ -124,13 +104,11 @@ function build(width) {
         c.right = Math.max(...poly.map(p => p.x));
         c.top = Math.min(...poly.map(p => p.y));
         c.bottom = Math.max(...poly.map(p => p.y));
-        c.look = null;          // colors of the cell and its dots, size of these
-        c.painted = null;       // the look on screen
+        c.look = null;
+        c.painted = null;
         c.hot = false;
     }
 }
-
-/* ---- the canvas ---- */
 
 const box = document.createElement("div");
 const canvas = box.appendChild(document.createElement("canvas"));
@@ -141,12 +119,8 @@ const gl = canvas.getContext && (canvas.getContext("webgl", OPTIONS)
                                  || canvas.getContext("experimental-webgl", OPTIONS));
 if (!gl) return;
 
-/* Two programs. One fills the cells, whose edges the borders hide. The other
-   draws everything else as capsules: a segment and a radius, so a border, a
-   line, or with both ends together a dot or a disc; the shader measures each
-   pixel's distance to the segment, which gives smooth edges. */
 const UNITS = `
-    uniform vec2 u_k;           // clip space per unit
+    uniform vec2 u_k;
     vec4 place(vec2 p) { return vec4(p.x * u_k.x, 1.0 - p.y * u_k.y, 0.0, 1.0); }`;
 const FILL = [`${UNITS}
     attribute vec2 a_pos;
@@ -157,12 +131,12 @@ const FILL = [`${UNITS}
     varying vec4 v_color;
     void main() { gl_FragColor = v_color; }`];
 const CAPSULE = [`${UNITS}
-    uniform mediump float u_px; // units per pixel
-    attribute vec4 a_seg;       // from xy to zw
-    attribute vec2 a_corner;    // of the quad around it, 0 or 1 each
+    uniform mediump float u_px;
+    attribute vec4 a_seg;
+    attribute vec2 a_corner;
     attribute vec4 a_paint;
     attribute float a_radius;
-    varying vec2 v_q, v_d;      // relative to the start, so mediump will do
+    varying vec2 v_q, v_d;
     varying float v_r;
     varying vec4 v_paint;
     void main() {
@@ -186,8 +160,8 @@ const CAPSULE = [`${UNITS}
         gl_FragColor = vec4(v_paint.rgb, v_paint.a * cover);
     }`];
 
-let flat, capsule;              // the programs, with their attributes and uniforms
-let cellPos, cellColor, wallSeg, dotSeg, dotStyle, querySeg; // the buffers
+let flat, capsule;
+let cellPos, cellColor, wallSeg, dotSeg, dotStyle, querySeg;
 
 function program(source) {
     const p = gl.createProgram();
@@ -221,11 +195,8 @@ function setup() {
 }
 if (!setup()) return;
 
-/* the quad around a capsule is two triangles, six corners */
 const CORNERS = [0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1];
 
-/* writes the six corners of the segment a-b at vertex i of data, each with
-   the extra values given; returns the next vertex */
 function quad(data, i, stride, a, b, extra) {
     for (let k = 0; k < 6; k++, i++) {
         const o = i * stride;
@@ -241,14 +212,14 @@ function upload(buffer, data, usage) {
     gl.bufferData(gl.ARRAY_BUFFER, data, usage);
 }
 
-let width = 0, height = 0, ratio = 1; // of the banner, in CSS pixels
-let scale = 1, zoom = 1;              // CSS and device pixels per unit
-let tint = 1;                         // that stretch
-let shown = [];                       // cells on screen
-let cellColors, dotStyles;            // what changes from frame to frame
-let triangles = 0, walls = 0, spots = 0; // vertex counts
-let drawn = false;                    // is the canvas up to date?
-let stale = true;                     // has the size possibly changed?
+let width = 0, height = 0, ratio = 1;
+let scale = 1, zoom = 1;
+let tint = 1;
+let shown = [];
+let cellColors, dotStyles;
+let triangles = 0, walls = 0, spots = 0;
+let drawn = false;
+let stale = true;
 
 function fit() {
     stale = false;
@@ -264,7 +235,6 @@ function fit() {
     shown = cells.filter(c => c.visible && c.right > -half && c.left < half);
     for (const c of cells) c.painted = null;
 
-    // the cells, as fans of triangles
     triangles = 0;
     for (const c of shown) { c.first = triangles; triangles += 3 * (c.poly.length - 2); }
     const pos = new Float32Array(2 * triangles);
@@ -276,7 +246,6 @@ function fit() {
     }
     upload(cellPos, pos, gl.STATIC_DRAW);
 
-    // the borders, each edge once
     const edges = new Map(), key = p => Math.round(p.x * 64) + "," + Math.round(p.y * 64);
     for (const c of shown)
         c.poly.forEach((a, k) => {
@@ -289,7 +258,6 @@ function fit() {
     for (const [a, b] of edges.values()) i = quad(seg, i, 6, a, b, []);
     upload(wallSeg, seg, gl.STATIC_DRAW);
 
-    // the points: where they are does not change, how they look does
     spots = 0;
     for (const c of shown) { c.firstDot = spots; spots += 6 * c.points.length; }
     const dots = new Float32Array(6 * spots);
@@ -309,15 +277,13 @@ function fit() {
     drawn = false;
 }
 
-/* ---- the query ---- */
-
 const motion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)");
 const calm = () => motion && motion.matches;
 const query = { x: 0, y: HEIGHT / 2 };
-let cursor = null;              // where the cursor is, if over the banner
-let phase = 0;                  // of the stroll
-let reach = 1;                  // how far the stroll goes from the middle
-let lagX = 0, lagY = 0, ease = .1; // query - target, fading after a change of target
+let cursor = null;
+let phase = 0;
+let reach = 1;
+let lagX = 0, lagY = 0, ease = .1;
 
 const targetX = () => cursor ? cursor.x : reach * Math.sin(phase);
 const targetY = () => cursor ? cursor.y : HEIGHT / 2;
@@ -338,13 +304,12 @@ function follow(e) {
 
 function release() {
     if (!cursor) return;
-    cursor = null;              // stroll on from here, in the same direction
+    cursor = null;
     const a = Math.asin(Math.max(-1, Math.min(1, query.x / reach)));
     phase = calm() ? 0 : Math.cos(phase) < 0 ? Math.PI - a : a;
     retarget(.35);
 }
 
-/* the cells nearest to the query, and in them the points nearest to it */
 let probed = [], near = [];
 
 function insert(list, item, size) {
@@ -365,10 +330,6 @@ function search() {
     }
 }
 
-/* ---- painting ---- */
-
-/* moves the colors along; true while some are still on their way, and
-   sets changed when one has moved by at least a step */
 let changed = false;
 function fadeCells(dt) {
     const blend = 1 - Math.exp(-dt / FADE);
@@ -377,7 +338,7 @@ function fadeCells(dt) {
         const fill = c.hot ? PROBED : COLORS[Math.min(COLORS.length - 1, Math.round(c.d * tint))];
         const dots = c.hot ? DOT_PROBED
             : fill[0] + fill[1] + fill[2] < 450 ? DOT_ON_DARK : DOT_ON_LIGHT;
-        const size = c.hot ? 58 : 42; // in tenths, to round like the colors
+        const size = c.hot ? 58 : 42;
         if (!c.look) c.look = [...fill, ...dots, size];
         const look = c.look;
         if (!c.painted) { c.painted = []; changed = true; }
@@ -393,7 +354,6 @@ function fadeCells(dt) {
     return busy;
 }
 
-/* binds a buffer of floats to attributes: [name, size] in order, all floats */
 function bind(prog, buffer, layout) {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     const stride = 4 * layout.reduce((n, [, size]) => n + size, 0);
@@ -405,13 +365,11 @@ function bind(prog, buffer, layout) {
     }
 }
 
-/* the same value for every vertex */
 function constant(prog, name, ...v) {
     gl.disableVertexAttribArray(prog[name]);
     gl["vertexAttrib" + v.length + "f"](prog[name], ...v);
 }
 
-/* the whole banner, at once */
 function paint() {
     for (const c of shown) {
         const v = c.painted;
@@ -459,12 +417,11 @@ const RED = [229 / 255, 56 / 255, 42 / 255, 1], WHITE = [1, 1, 1, 1];
 const SHADE = [0, 0, 0, .27];
 let queryData = new Float32Array(0);
 
-/* the query and its neighbors, as capsules; returns their vertex count */
 function paintQuery() {
     const r = near.length ? near[near.length - 1].d : 0;
     const parts = [];
     const add = (a, b, radius, paint) => parts.push([a, b, [...paint, radius]]);
-    if (near.length) {          // radius of the K-th neighbor, dashed
+    if (near.length) {
         for (let k = 0; k < 52; k++) {
             const t0 = 2 * Math.PI * k / 52, t1 = t0 + 2 * Math.PI * .58 / 52;
             add({ x: query.x + r * Math.cos(t0), y: query.y + r * Math.sin(t0) },
@@ -483,8 +440,6 @@ function paintQuery() {
     return i;
 }
 
-/* ---- the loop ---- */
-
 let running = false, last = -FRAME_MS, due = 0;
 
 function wake() {
@@ -494,8 +449,6 @@ function wake() {
     next();
 }
 
-/* frames keep to a schedule, so that rounding to the screen's refreshes does
-   not add up; the timer is a little early, not to miss one */
 function next() {
     const now = performance.now();
     due = Math.max(due + FRAME_MS, now);
@@ -504,7 +457,7 @@ function next() {
 
 function frame(now) {
     if (stale) fit();
-    if (!width || window.pageYOffset >= height) { // the page covers the banner
+    if (!width || window.pageYOffset >= height) {
         running = false;
         return;
     }
@@ -524,7 +477,7 @@ function frame(now) {
     const busy = fadeCells(dt);
     if (changed || moved || !drawn) paint();
     changed = false;
-    if (!strolling && !moved && !busy) running = false; // until something happens
+    if (!strolling && !moved && !busy) running = false;
     else next();
 }
 
@@ -537,7 +490,7 @@ canvas.addEventListener("webglcontextrestored", () => {
 box.className = img.className;
 box.setAttribute("aria-hidden", "true");
 box.style.cssText = "position:relative;overflow:hidden;cursor:none;"
-    + "touch-action:pan-y"; // sideways drags steer, vertical ones scroll
+    + "touch-action:pan-y";
 img.parentNode.replaceChild(box, img);
 
 for (const type of ["pointerenter", "pointerdown", "pointermove"]) box.addEventListener(type, follow);

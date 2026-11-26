@@ -284,5 +284,32 @@ festival welcoming 15k+ people.</p>
 
 </div>
 
+<script type="text/javascript">
+(function () {
+    var h = window.history, p = window.performance;
+    if (!h || !h.replaceState || !document.addEventListener) return;
+    var nav = p && p.getEntriesByType && p.getEntriesByType("navigation")[0];
+    var reload = nav ? nav.type === "reload"
+        : !!(p && p.navigation && p.navigation.type === 1);
+    if (reload) {
+        if ("scrollRestoration" in h) h.scrollRestoration = "manual";
+        if (location.hash) h.replaceState(null, "", location.pathname + location.search);
+        window.scrollTo(0, 0);
+        window.addEventListener("load", function () {
+            window.scrollTo(0, 0);
+            if ("scrollRestoration" in h) h.scrollRestoration = "auto";
+        });
+    }
+    document.addEventListener("click", function (e) {
+        var a = e.target.closest && e.target.closest('a[href^="#"]');
+        if (!a || e.button || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+        var to = document.getElementById(a.getAttribute("href").slice(1));
+        if (!to) return;
+        e.preventDefault();
+        to.scrollIntoView();
+    });
+})();
+</script>
+
 </body>
 </html>

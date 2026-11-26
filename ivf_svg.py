@@ -1,7 +1,3 @@
-"""Draws the banner, public/ivf.svg (needs numpy).
-
-usage: python3 ivf_svg.py public/ivf.svg 8
-"""
 import numpy as np, sys
 from collections import defaultdict
 rng=np.random.default_rng(int(sys.argv[2]))
@@ -32,16 +28,14 @@ P=np.array(P); dq=np.hypot(*(P-Q).T)
 top=sorted((i for i in range(len(P)) if own[i] in probed),key=lambda i:dq[i])[:16]
 rk=dq[top[-1]]/SC
 
-# ---- vector part, in 1800x380 user units
 C/=SC; P/=SC; Q/=SC; W//=SC; H//=SC
-M=8   # overshoot, hidden by the viewBox
+M=8
 def num(v):
     s=f'{v:.1f}'
     if s.endswith('.0'): s=s[:-2]
     return '0' if s=='-0' else s
 pt=lambda p:num(p[0])+','+num(p[1])
 def cell(i):
-    """Voronoi cell of C[i]: box clipped by every bisector; e[k] = neighbour across edge k -> k+1"""
     poly=[np.array(p,float) for p in((-M,-M),(W+M,-M),(W+M,H+M),(-M,H+M))]; e=[-1]*4
     for j in np.argsort(((C-C[i])**2).sum(1))[1:]:
         nv=C[j]-C[i]; off=nv@(C[i]+C[j])/2
@@ -78,19 +72,15 @@ def wrap(parts,w=100):
         if len(out[-1])+len(s)>w: out.append('')
         out[-1]+=s
     return '\n'.join(out)
-o=[f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">',
- '<!-- cells -->']
+o=[f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">']
 for c,v in fills.items(): o.append(f'<path fill="{c}" d="{wrap(v)}"/>')
-o+=['<!-- cell borders -->',f'<path fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" d="{wrap(edges)}"/>',
- '<!-- points: zero-length strokes with round caps -->','<g fill="none" stroke-linecap="round">']
+o+=[f'<path fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" d="{wrap(edges)}"/>',
+ '<g fill="none" stroke-linecap="round">']
 for k,w,c in(('l',4.2,'#a9d3d6'),('d',4.2,'#2a6468'),('p',5.8,'#101f3d')):
     o.append(f'<path stroke="{c}" stroke-width="{w}" d="{wrap(dots[k])}"/>')
 q=f'cx="{num(Q[0])}" cy="{num(Q[1])}"'
-o+=['<!-- radius of the 16th neighbor -->',
- f'<circle {q} r="{rk:.2f}" stroke="#000" stroke-opacity=".27" stroke-width="1.1" stroke-linecap="butt" stroke-dasharray="{.58*arc:.4f} {.42*arc:.4f}" stroke-dashoffset="{-.21*arc:.4f}"/>',
- '<!-- the 16 neighbors -->',
+o+=[f'<circle {q} r="{rk:.2f}" stroke="#000" stroke-opacity=".27" stroke-width="1.1" stroke-linecap="butt" stroke-dasharray="{.58*arc:.4f} {.42*arc:.4f}" stroke-dashoffset="{-.21*arc:.4f}"/>',
  f'<path stroke="#e5382a" stroke-width="1.6" d="{wrap(["M"+pt(Q)+" "+pt(P[i]) for i in top])}"/>']
-# drawn one by one, so overlapping neighbors keep their own white ring
 for i in top: o.append(f'<circle cx="{num(P[i][0])}" cy="{num(P[i][1])}" r="4.05" fill="#e5382a" stroke="#fff" stroke-width="1.1"/>')
-o+=['</g>','<!-- query -->',f'<circle {q} r="9.5" fill="#fff"/>',f'<circle {q} r="7.8" fill="#e5382a"/>',f'<circle {q} r="3" fill="#fff"/>','</svg>','']
+o+=['</g>',f'<circle {q} r="9.5" fill="#fff"/>',f'<circle {q} r="7.8" fill="#e5382a"/>',f'<circle {q} r="3" fill="#fff"/>','</svg>','']
 open(sys.argv[1],'w').write('\n'.join(o))
