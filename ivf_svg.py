@@ -16,7 +16,7 @@ Q=np.array([W/2,H*.5])
 dc=np.hypot(*(C-Q).T)
 probed=set(np.argsort(dc)[:4])
 col=np.array([ramp(np.rint(d/SC/45)*45) for d in dc])
-for i in probed: col[i]=hexa('ffe14d')
+for i in probed: col[i]=hexa('fff027')
 P=[];own=[]
 for i in range(n):
     for p in C[i]+rng.normal(0,.27*cw,(rng.integers(9,15),2)):
@@ -80,7 +80,7 @@ for k,w,c in(('l',4.2,'#a3d8dc'),('d',4.2,'#226b70'),('p',5.8,'#0a1d43')):
     o.append(f'<path stroke="{c}" stroke-width="{w}" d="{wrap(dots[k])}"/>')
 q=f'cx="{num(Q[0])}" cy="{num(Q[1])}"'
 o+=[f'<circle {q} r="{rk:.2f}" stroke="#000" stroke-opacity=".27" stroke-width="1.1" stroke-linecap="butt" stroke-dasharray="{.58*arc:.4f} {.42*arc:.4f}" stroke-dashoffset="{-.21*arc:.4f}"/>',
- f'<path stroke="#e5382a" stroke-width="1.6" d="{wrap(["M"+pt(Q)+" "+pt(P[i]) for i in top])}"/>']
-for i in top: o.append(f'<circle cx="{num(P[i][0])}" cy="{num(P[i][1])}" r="4.05" fill="#e5382a" stroke="#fff" stroke-width="1.1"/>')
-o+=['</g>',f'<circle {q} r="9.5" fill="#fff"/>',f'<circle {q} r="7.8" fill="#e5382a"/>',f'<circle {q} r="3" fill="#fff"/>','</svg>','']
+ f'<path stroke="#ff0000" stroke-width="1.6" d="{wrap(["M"+pt(Q)+" "+pt(P[i]) for i in top])}"/>']
+for i in top: o.append(f'<circle cx="{num(P[i][0])}" cy="{num(P[i][1])}" r="4.05" fill="#ff0000" stroke="#fff" stroke-width="1.1"/>')
+o+=['</g>',f'<circle {q} r="9.5" fill="#fff"/>',f'<circle {q} r="7.8" fill="#ff0000"/>',f'<circle {q} r="3" fill="#fff"/>','</svg>','']
 open(sys.argv[1],'w').write('\n'.join(o))

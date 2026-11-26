@@ -15,7 +15,7 @@ const rgb = h => [0, 2, 4].map(i => parseInt(h.substr(i, 2), 16));
 const RAMP = ["fff0a3", "d9f284", "87d994", "38c3ae", "129bb5", "0e6ba2",
               "0f4680", "0d2d5d", "0a1d43"].map(rgb);
 const STOPS = [-60, 20, 130, 250, 380, 520, 670, 820, 900];
-const PROBED = rgb("ffe14d");
+const PROBED = rgb("fff027");
 const DOT_PROBED = rgb("0a1d43"), DOT_ON_DARK = rgb("a3d8dc"), DOT_ON_LIGHT = rgb("226b70");
 
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -436,7 +436,7 @@ function paint() {
     drawn = true;
 }
 
-const RED = [229 / 255, 56 / 255, 42 / 255, 1], WHITE = [1, 1, 1, 1];
+const RED = [1, 0, 0, 1], WHITE = [1, 1, 1, 1];
 const SHADE = [0, 0, 0, .27];
 let queryData = new Float32Array(0);
 
