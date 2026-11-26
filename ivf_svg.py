@@ -16,7 +16,7 @@ Q=np.array([W/2,H*.5])
 dc=np.hypot(*(C-Q).T)
 probed=set(np.argsort(dc)[:4])
 col=np.array([ramp(np.rint(d/SC/45)*45) for d in dc])
-for i in probed: col[i]=hexa('fff027')
+for i in probed: col[i]=hexa('ffe93a')
 P=[];own=[]
 for i in range(n):
     for p in C[i]+rng.normal(0,.27*cw,(rng.integers(9,15),2)):
